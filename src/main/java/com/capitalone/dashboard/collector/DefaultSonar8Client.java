@@ -15,8 +15,8 @@ import org.springframework.web.client.RestClientException;
 public class DefaultSonar8Client extends DefaultSonar6Client {
     private static final Log LOG = LogFactory.getLog(DefaultSonar8Client.class);
 
-    static final String URL_QUALITY_PROFILE_CHANGES = "/api/qualityprofiles/changelog?qualityProfile=%s&language=%s";
-    static final String URL_RESOURCE_DETAILS = "/api/measures/component?component=%s&metricKeys=%s";
+    static final String URL_QUALITY_PROFILE_CHANGES = "/web_api/qualityprofiles/changelog?qualityProfile=%s&language=%s";
+    static final String URL_RESOURCE_DETAILS = "/web_api/measures/component?component=%s&metricKeys=%s";
 
     @Autowired
     public DefaultSonar8Client(RestClient restClient, SonarSettings settings) {

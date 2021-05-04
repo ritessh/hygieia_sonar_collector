@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.capitalone.dashboard.collector.DefaultSonar8ClientTest" time="0.009" tests="3" errors="0" skipped="0" failures="0">
+<testsuite name="com.capitalone.dashboard.collector.DefaultSonar8ClientTest" time="0.005" tests="3" errors="3" skipped="0" failures="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/lib"/>
@@ -63,7 +63,36 @@
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase name="currentCodeQuality" classname="com.capitalone.dashboard.collector.DefaultSonar8ClientTest" time="0.004"/>
-  <testcase name="getProjects" classname="com.capitalone.dashboard.collector.DefaultSonar8ClientTest" time="0.003"/>
-  <testcase name="getChangeLog" classname="com.capitalone.dashboard.collector.DefaultSonar8ClientTest" time="0.002"/>
+  <testcase name="currentCodeQuality" classname="com.capitalone.dashboard.collector.DefaultSonar8ClientTest" time="0.002">
+    <error type="java.lang.NullPointerException:">java.lang.NullPointerException: null
+	at com.capitalone.dashboard.client.RestClient.makeRestCallGet(RestClient.java:162)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.currentCodeQuality(DefaultSonar6Client.java:203)
+	at com.capitalone.dashboard.collector.DefaultSonar8ClientTest.currentCodeQuality(DefaultSonar8ClientTest.java:92)
+</error>
+    <system-out><![CDATA[2021-05-04 15:43:07,166 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/measures/component?component=test&metricKeys=ncloc,violations,new_vulnerabilities,critical_violations,major_violations,blocker_violations,tests,test_success_density,test_errors,test_failures,coverage,line_coverage,sqale_index,alert_status,quality_gate_details http_status=java.lang.NullPointerException http_duration=0
+]]></system-out>
+  </testcase>
+  <testcase name="getProjects" classname="com.capitalone.dashboard.collector.DefaultSonar8ClientTest" time="0.001">
+    <error type="java.lang.NullPointerException:">java.lang.NullPointerException: null
+	at com.capitalone.dashboard.client.RestClient.makeRestCallGet(RestClient.java:162)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getResponse(DefaultSonar6Client.java:330)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.parseJsonObject(DefaultSonar6Client.java:325)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getProjectsWithPaging(DefaultSonar6Client.java:142)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getProjects(DefaultSonar6Client.java:115)
+	at com.capitalone.dashboard.collector.DefaultSonar8ClientTest.getProjects(DefaultSonar8ClientTest.java:75)
+</error>
+    <system-out><![CDATA[2021-05-04 15:43:07,167 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/components/search?qualifiers=TRK&ps=500 http_status=java.lang.NullPointerException http_duration=0
+]]></system-out>
+  </testcase>
+  <testcase name="getChangeLog" classname="com.capitalone.dashboard.collector.DefaultSonar8ClientTest" time="0.002">
+    <error type="java.lang.NullPointerException:">java.lang.NullPointerException: null
+	at com.capitalone.dashboard.client.RestClient.makeRestCallGet(RestClient.java:162)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getResponse(DefaultSonar6Client.java:330)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.parseAsArray(DefaultSonar6Client.java:320)
+	at com.capitalone.dashboard.collector.DefaultSonar8Client.getQualityProfileConfigurationChanges(DefaultSonar8Client.java:30)
+	at com.capitalone.dashboard.collector.DefaultSonar8ClientTest.getChangeLog(DefaultSonar8ClientTest.java:66)
+</error>
+    <system-out><![CDATA[2021-05-04 15:43:07,170 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/qualityprofiles/changelog?qualityProfile=name&language=java http_status=java.lang.NullPointerException http_duration=0
+]]></system-out>
+  </testcase>
 </testsuite>

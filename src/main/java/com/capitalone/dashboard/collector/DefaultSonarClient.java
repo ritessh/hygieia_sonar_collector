@@ -30,11 +30,11 @@ import java.util.List;
 public class DefaultSonarClient implements SonarClient {
     private static final Log LOG = LogFactory.getLog(DefaultSonarClient.class);
 
-    protected static final String URL_RESOURCES = "/api/resources?format=json";
-    protected static final String URL_RESOURCE_DETAILS = "/api/resources?format=json&resource=%s&metrics=%s&includealerts=true";
-    protected static final String URL_QUALITY_PROFILES = "/api/qualityprofiles/search";
-    protected static final String URL_QUALITY_PROFILE_PROJECT_DETAILS = "/api/qualityprofiles/projects?key=";
-    protected static final String URL_QUALITY_PROFILE_CHANGES = "/api/qualityprofiles/changelog?profileKey=";
+    protected static final String URL_RESOURCES = "/web_api/resources?format=json";
+    protected static final String URL_RESOURCE_DETAILS = "/web_api/resources?format=json&resource=%s&metrics=%s&includealerts=true";
+    protected static final String URL_QUALITY_PROFILES = "/web_api/qualityprofiles/search";
+    protected static final String URL_QUALITY_PROFILE_PROJECT_DETAILS = "/web_api/qualityprofiles/projects?key=";
+    protected static final String URL_QUALITY_PROFILE_CHANGES = "/web_api/qualityprofiles/changelog?profileKey=";
     protected static final String DEFAULT_METRICS = "ncloc,line_coverage,violations,critical_violations,major_violations,blocker_violations,violations_density,sqale_index,test_success_density,test_failures,test_errors,tests";
     protected final String metrics;
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.capitalone.dashboard.collector.DefaultSonar6ClientTest" time="0.481" tests="4" errors="0" skipped="0" failures="0">
+<testsuite name="com.capitalone.dashboard.collector.DefaultSonar6ClientTest" time="0.363" tests="4" errors="4" skipped="0" failures="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/lib"/>
@@ -63,8 +63,74 @@
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase name="currentCodeQualityForNullProjectData" classname="com.capitalone.dashboard.collector.DefaultSonar6ClientTest" time="0.406"/>
-  <testcase name="getProjects500" classname="com.capitalone.dashboard.collector.DefaultSonar6ClientTest" time="0.067"/>
-  <testcase name="currentCodeQuality" classname="com.capitalone.dashboard.collector.DefaultSonar6ClientTest" time="0.006"/>
-  <testcase name="getProjects" classname="com.capitalone.dashboard.collector.DefaultSonar6ClientTest" time="0.002"/>
+  <testcase name="currentCodeQualityForNullProjectData" classname="com.capitalone.dashboard.collector.DefaultSonar6ClientTest" time="0.349">
+    <error type="java.lang.NullPointerException:">java.lang.NullPointerException: null
+	at com.capitalone.dashboard.client.RestClient.makeRestCallGet(RestClient.java:162)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.currentCodeQuality(DefaultSonar6Client.java:203)
+	at com.capitalone.dashboard.collector.DefaultSonar6ClientTest.currentCodeQualityForNullProjectData(DefaultSonar6ClientTest.java:114)
+</error>
+    <system-out><![CDATA[15:43:01,577 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.xml]
+15:43:01,577 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback.groovy]
+15:43:01,577 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Found resource [logback.xml] at [file:/Users/ritesh/Hygieia/hygieia-codequality-sonar-collector/target/classes/logback.xml]
+15:43:01,578 |-WARN in ch.qos.logback.classic.LoggerContext[default] - Resource [logback.xml] occurs multiple times on the classpath.
+15:43:01,578 |-WARN in ch.qos.logback.classic.LoggerContext[default] - Resource [logback.xml] occurs at [jar:file:/Users/ritesh/.m2/repository/com/capitalone/dashboard/core/3.14.9/core-3.14.9.jar!/logback.xml]
+15:43:01,578 |-WARN in ch.qos.logback.classic.LoggerContext[default] - Resource [logback.xml] occurs at [file:/Users/ritesh/Hygieia/hygieia-codequality-sonar-collector/target/classes/logback.xml]
+15:43:01,661 |-INFO in ch.qos.logback.classic.joran.action.ConfigurationAction - debug attribute not set
+15:43:01,662 |-INFO in ch.qos.logback.core.joran.action.AppenderAction - About to instantiate appender of type [ch.qos.logback.core.ConsoleAppender]
+15:43:01,674 |-INFO in ch.qos.logback.core.joran.action.AppenderAction - Naming appender as [STDOUT]
+15:43:01,683 |-INFO in ch.qos.logback.core.joran.action.NestedComplexPropertyIA - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+15:43:01,737 |-INFO in ch.qos.logback.core.joran.action.AppenderAction - About to instantiate appender of type [ch.qos.logback.core.rolling.RollingFileAppender]
+15:43:01,744 |-INFO in ch.qos.logback.core.joran.action.AppenderAction - Naming appender as [ROLLING]
+15:43:01,763 |-INFO in c.q.l.core.rolling.TimeBasedRollingPolicy@129958347 - No compression will be used
+15:43:01,765 |-INFO in c.q.l.core.rolling.TimeBasedRollingPolicy@129958347 - Will use the pattern logs/codequalitycollector-%d{yyyy-MM-dd}.%i.log for the active file
+15:43:01,770 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@2f382a5e - The date pattern is 'yyyy-MM-dd' from file name pattern 'logs/codequalitycollector-%d{yyyy-MM-dd}.%i.log'.
+15:43:01,770 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@2f382a5e - Roll-over at midnight.
+15:43:01,773 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@2f382a5e - Setting initial period to Tue May 04 15:43:01 IST 2021
+15:43:01,773 |-WARN in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@2f382a5e - SizeAndTimeBasedFNATP is deprecated. Use SizeAndTimeBasedRollingPolicy instead
+15:43:01,773 |-WARN in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@2f382a5e - For more information see http://logback.qos.ch/manual/appenders.html#SizeAndTimeBasedRollingPolicy
+15:43:01,777 |-INFO in ch.qos.logback.core.joran.action.NestedComplexPropertyIA - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+15:43:01,778 |-INFO in ch.qos.logback.core.rolling.RollingFileAppender[ROLLING] - Active log file name: logs/codequalitycollector-2021-05-04.0.log
+15:43:01,778 |-INFO in ch.qos.logback.core.rolling.RollingFileAppender[ROLLING] - File property is set to [null]
+15:43:01,780 |-INFO in ch.qos.logback.classic.joran.action.RootLoggerAction - Setting level of ROOT logger to INFO
+15:43:01,780 |-INFO in ch.qos.logback.core.joran.action.AppenderRefAction - Attaching appender named [ROLLING] to Logger[ROOT]
+15:43:01,781 |-INFO in ch.qos.logback.core.joran.action.AppenderRefAction - Attaching appender named [STDOUT] to Logger[ROOT]
+15:43:01,781 |-INFO in ch.qos.logback.classic.joran.action.ConfigurationAction - End of configuration.
+15:43:01,782 |-INFO in ch.qos.logback.classic.joran.JoranConfigurator@12b5736c - Registering current configuration as safe fallback point
+
+2021-05-04 15:43:01,845 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/measures/component?format=json&componentId=AVu3b-MAphY78UZXuYHp&metricKeys=ncloc,violations,new_vulnerabilities,critical_violations,major_violations,blocker_violations,tests,test_success_density,test_errors,test_failures,coverage,line_coverage,sqale_index,alert_status,quality_gate_details&includealerts=true http_status=java.lang.NullPointerException http_duration=1
+]]></system-out>
+  </testcase>
+  <testcase name="getProjects500" classname="com.capitalone.dashboard.collector.DefaultSonar6ClientTest" time="0.012">
+    <error type="java.lang.NullPointerException:">java.lang.NullPointerException: null
+	at com.capitalone.dashboard.client.RestClient.makeRestCallGet(RestClient.java:162)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getResponse(DefaultSonar6Client.java:330)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.parseJsonObject(DefaultSonar6Client.java:325)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getProjectsWithPaging(DefaultSonar6Client.java:142)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getProjects(DefaultSonar6Client.java:115)
+	at com.capitalone.dashboard.collector.DefaultSonar6ClientTest.getProjects500(DefaultSonar6ClientTest.java:84)
+</error>
+    <system-out><![CDATA[2021-05-04 15:43:01,873 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/components/search?qualifiers=TRK&ps=500 http_status=java.lang.NullPointerException http_duration=1
+]]></system-out>
+  </testcase>
+  <testcase name="currentCodeQuality" classname="com.capitalone.dashboard.collector.DefaultSonar6ClientTest" time="0.001">
+    <error type="java.lang.NullPointerException:">java.lang.NullPointerException: null
+	at com.capitalone.dashboard.client.RestClient.makeRestCallGet(RestClient.java:162)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.currentCodeQuality(DefaultSonar6Client.java:203)
+	at com.capitalone.dashboard.collector.DefaultSonar6ClientTest.currentCodeQuality(DefaultSonar6ClientTest.java:97)
+</error>
+    <system-out><![CDATA[2021-05-04 15:43:01,876 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/measures/component?format=json&componentId=AVu3b-MAphY78UZXuYHp&metricKeys=ncloc,violations,new_vulnerabilities,critical_violations,major_violations,blocker_violations,tests,test_success_density,test_errors,test_failures,coverage,line_coverage,sqale_index,alert_status,quality_gate_details&includealerts=true http_status=java.lang.NullPointerException http_duration=0
+]]></system-out>
+  </testcase>
+  <testcase name="getProjects" classname="com.capitalone.dashboard.collector.DefaultSonar6ClientTest" time="0.001">
+    <error type="java.lang.NullPointerException:">java.lang.NullPointerException: null
+	at com.capitalone.dashboard.client.RestClient.makeRestCallGet(RestClient.java:162)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getResponse(DefaultSonar6Client.java:330)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.parseJsonObject(DefaultSonar6Client.java:325)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getProjectsWithPaging(DefaultSonar6Client.java:142)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getProjects(DefaultSonar6Client.java:115)
+	at com.capitalone.dashboard.collector.DefaultSonar6ClientTest.getProjects(DefaultSonar6ClientTest.java:59)
+</error>
+    <system-out><![CDATA[2021-05-04 15:43:01,878 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/components/search?qualifiers=TRK&ps=500 http_status=java.lang.NullPointerException http_duration=1
+]]></system-out>
+  </testcase>
 </testsuite>

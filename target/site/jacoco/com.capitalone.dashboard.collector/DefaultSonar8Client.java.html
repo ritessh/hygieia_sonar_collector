@@ -15,8 +15,8 @@ import org.springframework.web.client.RestClientException;
 public class DefaultSonar8Client extends DefaultSonar6Client {
 <span class="fc" id="L16">    private static final Log LOG = LogFactory.getLog(DefaultSonar8Client.class);</span>
 
-    static final String URL_QUALITY_PROFILE_CHANGES = &quot;/api/qualityprofiles/changelog?qualityProfile=%s&amp;language=%s&quot;;
-    static final String URL_RESOURCE_DETAILS = &quot;/api/measures/component?component=%s&amp;metricKeys=%s&quot;;
+    static final String URL_QUALITY_PROFILE_CHANGES = &quot;/web_api/qualityprofiles/changelog?qualityProfile=%s&amp;language=%s&quot;;
+    static final String URL_RESOURCE_DETAILS = &quot;/web_api/measures/component?component=%s&amp;metricKeys=%s&quot;;
 
     @Autowired
     public DefaultSonar8Client(RestClient restClient, SonarSettings settings) {
@@ -27,8 +27,8 @@ public class DefaultSonar8Client extends DefaultSonar6Client {
     public JSONArray getQualityProfileConfigurationChanges(String instanceUrl, JSONObject qualityProfile) throws ParseException{
 <span class="fc" id="L28">        String url = String.format(instanceUrl + URL_QUALITY_PROFILE_CHANGES, qualityProfile.get(&quot;name&quot;), qualityProfile.get(&quot;language&quot;));</span>
         try {
-<span class="fc" id="L30">            JSONArray qualityProfileConfigChanges = this.parseAsArray(url, &quot;events&quot;);</span>
-<span class="fc" id="L31">            return qualityProfileConfigChanges;</span>
+<span class="nc" id="L30">            JSONArray qualityProfileConfigChanges = this.parseAsArray(url, &quot;events&quot;);</span>
+<span class="nc" id="L31">            return qualityProfileConfigChanges;</span>
 <span class="nc" id="L32">        } catch (ParseException e) {</span>
 <span class="nc" id="L33">            LOG.error(&quot;Could not parse response from: &quot; + url, e);</span>
 <span class="nc" id="L34">            throw e;</span>
@@ -40,11 +40,11 @@ public class DefaultSonar8Client extends DefaultSonar6Client {
 
     @Override
     protected SonarProject parseSonarProject(String instanceUrl, JSONObject prjData) {
-<span class="fc" id="L43">        SonarProject project = new SonarProject();</span>
-<span class="fc" id="L44">        project.setInstanceUrl(instanceUrl);</span>
-<span class="fc" id="L45">        project.setProjectId(str(prjData, KEY));</span>
-<span class="fc" id="L46">        project.setProjectName(str(prjData, NAME));</span>
-<span class="fc" id="L47">        return project;</span>
+<span class="nc" id="L43">        SonarProject project = new SonarProject();</span>
+<span class="nc" id="L44">        project.setInstanceUrl(instanceUrl);</span>
+<span class="nc" id="L45">        project.setProjectId(str(prjData, KEY));</span>
+<span class="nc" id="L46">        project.setProjectName(str(prjData, NAME));</span>
+<span class="nc" id="L47">        return project;</span>
 
     }
 

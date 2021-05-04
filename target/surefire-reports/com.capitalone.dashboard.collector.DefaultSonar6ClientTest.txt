@@ -1,4 +1,34 @@
 -------------------------------------------------------------------------------
 Test set: com.capitalone.dashboard.collector.DefaultSonar6ClientTest
 -------------------------------------------------------------------------------
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.743 sec - in com.capitalone.dashboard.collector.DefaultSonar6ClientTest
+Tests run: 4, Failures: 0, Errors: 4, Skipped: 0, Time elapsed: 0.582 sec <<< FAILURE! - in com.capitalone.dashboard.collector.DefaultSonar6ClientTest
+currentCodeQualityForNullProjectData(com.capitalone.dashboard.collector.DefaultSonar6ClientTest)  Time elapsed: 0.349 sec  <<< ERROR!
+java.lang.NullPointerException: null
+	at com.capitalone.dashboard.client.RestClient.makeRestCallGet(RestClient.java:162)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.currentCodeQuality(DefaultSonar6Client.java:203)
+	at com.capitalone.dashboard.collector.DefaultSonar6ClientTest.currentCodeQualityForNullProjectData(DefaultSonar6ClientTest.java:114)
+
+getProjects500(com.capitalone.dashboard.collector.DefaultSonar6ClientTest)  Time elapsed: 0.012 sec  <<< ERROR!
+java.lang.NullPointerException: null
+	at com.capitalone.dashboard.client.RestClient.makeRestCallGet(RestClient.java:162)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getResponse(DefaultSonar6Client.java:330)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.parseJsonObject(DefaultSonar6Client.java:325)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getProjectsWithPaging(DefaultSonar6Client.java:142)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getProjects(DefaultSonar6Client.java:115)
+	at com.capitalone.dashboard.collector.DefaultSonar6ClientTest.getProjects500(DefaultSonar6ClientTest.java:84)
+
+currentCodeQuality(com.capitalone.dashboard.collector.DefaultSonar6ClientTest)  Time elapsed: 0.001 sec  <<< ERROR!
+java.lang.NullPointerException: null
+	at com.capitalone.dashboard.client.RestClient.makeRestCallGet(RestClient.java:162)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.currentCodeQuality(DefaultSonar6Client.java:203)
+	at com.capitalone.dashboard.collector.DefaultSonar6ClientTest.currentCodeQuality(DefaultSonar6ClientTest.java:97)
+
+getProjects(com.capitalone.dashboard.collector.DefaultSonar6ClientTest)  Time elapsed: 0.001 sec  <<< ERROR!
+java.lang.NullPointerException: null
+	at com.capitalone.dashboard.client.RestClient.makeRestCallGet(RestClient.java:162)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getResponse(DefaultSonar6Client.java:330)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.parseJsonObject(DefaultSonar6Client.java:325)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getProjectsWithPaging(DefaultSonar6Client.java:142)
+	at com.capitalone.dashboard.collector.DefaultSonar6Client.getProjects(DefaultSonar6Client.java:115)
+	at com.capitalone.dashboard.collector.DefaultSonar6ClientTest.getProjects(DefaultSonar6ClientTest.java:59)
+

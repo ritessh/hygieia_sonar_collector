@@ -17,7 +17,7 @@ import java.util.List;
 public class DefaultSonar56Client extends DefaultSonarClient {
     private static final Log LOG = LogFactory.getLog(DefaultSonar56Client.class);
 
-    private static final String URL_PROJECTS = "/api/projects?format=json";
+    private static final String URL_PROJECTS = "/web_api/projects?format=json";
 
     @Autowired
     public DefaultSonar56Client(RestClient restClient, SonarSettings settings) {

@@ -50,3 +50,46 @@
 2021-05-04 13:39:12,107 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/components/search?qualifiers=TRK&ps=500 http_status=200 http_duration=0
 2021-05-04 13:39:12,108 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/components/search?qualifiers=TRK&ps=500 http_status=200 http_duration=0
 2021-05-04 13:39:12,110 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/qualityprofiles/changelog?qualityProfile=name&language=java http_status=200 http_duration=0
+2021-05-04 15:43:01,845 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/measures/component?format=json&componentId=AVu3b-MAphY78UZXuYHp&metricKeys=ncloc,violations,new_vulnerabilities,critical_violations,major_violations,blocker_violations,tests,test_success_density,test_errors,test_failures,coverage,line_coverage,sqale_index,alert_status,quality_gate_details&includealerts=true http_status=java.lang.NullPointerException http_duration=1
+2021-05-04 15:43:01,873 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/components/search?qualifiers=TRK&ps=500 http_status=java.lang.NullPointerException http_duration=1
+2021-05-04 15:43:01,876 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/measures/component?format=json&componentId=AVu3b-MAphY78UZXuYHp&metricKeys=ncloc,violations,new_vulnerabilities,critical_violations,major_violations,blocker_violations,tests,test_success_density,test_errors,test_failures,coverage,line_coverage,sqale_index,alert_status,quality_gate_details&includealerts=true http_status=java.lang.NullPointerException http_duration=0
+2021-05-04 15:43:01,878 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/components/search?qualifiers=TRK&ps=500 http_status=java.lang.NullPointerException http_duration=1
+2021-05-04 15:43:07,046 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 15:43:07,047 [main] INFO  c.c.d.collector.CollectorTask - server1
+2021-05-04 15:43:07,047 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 15:43:07,048 [main] INFO  c.c.d.collector.SonarCollectorTask - addNewProjects projectsInSonar=0 existingProjects=0 new=0 updated=0 timeUsed=0
+2021-05-04 15:43:07,048 [main] INFO  c.c.d.collector.SonarCollectorTask - refreshData updated, total=0, updated=0, disabled=0, timeTaken=1620123187048
+2021-05-04 15:43:07,049 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 15:43:07,049 [main] INFO  c.c.d.collector.CollectorTask - server2
+2021-05-04 15:43:07,049 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 15:43:07,049 [main] INFO  c.c.d.collector.SonarCollectorTask - addNewProjects projectsInSonar=0 existingProjects=0 new=0 updated=0 timeUsed=0
+2021-05-04 15:43:07,050 [main] INFO  c.c.d.collector.SonarCollectorTask - refreshData updated, total=0, updated=0, disabled=0, timeTaken=1620123187050
+2021-05-04 15:43:07,134 [main] INFO  c.c.d.collector.SonarCollectorTask - SonarCollectorTask:collect stop, totalProcessSeconds=0, totalProjectCount=0
+2021-05-04 15:43:07,143 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 15:43:07,143 [main] INFO  c.c.d.collector.CollectorTask - server1
+2021-05-04 15:43:07,143 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 15:43:07,144 [main] INFO  c.c.d.collector.SonarCollectorTask - addNewProjects projectsInSonar=0 existingProjects=0 new=0 updated=0 timeUsed=0
+2021-05-04 15:43:07,144 [main] INFO  c.c.d.collector.SonarCollectorTask - refreshData updated, total=0, updated=0, disabled=0, timeTaken=1620123187144
+2021-05-04 15:43:07,144 [main] INFO  c.c.d.collector.SonarCollectorTask - SonarCollectorTask:collect stop, totalProcessSeconds=0, totalProjectCount=0
+2021-05-04 15:43:07,146 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 15:43:07,147 [main] INFO  c.c.d.collector.CollectorTask - server1
+2021-05-04 15:43:07,147 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 15:43:07,150 [main] INFO  c.c.d.collector.SonarCollectorTask - addNewProjects projectsInSonar=0 existingProjects=0 new=0 updated=0 timeUsed=0
+2021-05-04 15:43:07,150 [main] INFO  c.c.d.collector.SonarCollectorTask - refreshData updated, total=0, updated=0, disabled=0, timeTaken=1620123187150
+2021-05-04 15:43:07,151 [main] INFO  c.c.d.collector.SonarCollectorTask - SonarCollectorTask:collect stop, totalProcessSeconds=0, totalProjectCount=0
+2021-05-04 15:43:07,154 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 15:43:07,154 [main] INFO  c.c.d.collector.CollectorTask - server1
+2021-05-04 15:43:07,154 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 15:43:07,155 [main] INFO  c.c.d.collector.SonarCollectorTask - addNewProjects projectsInSonar=0 existingProjects=0 new=0 updated=0 timeUsed=0
+2021-05-04 15:43:07,155 [main] INFO  c.c.d.collector.SonarCollectorTask - refreshData updated, total=0, updated=0, disabled=0, timeTaken=1620123187155
+2021-05-04 15:43:07,155 [main] INFO  c.c.d.collector.SonarCollectorTask - SonarCollectorTask:collect stop, totalProcessSeconds=0, totalProjectCount=0
+2021-05-04 15:43:07,158 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 15:43:07,158 [main] INFO  c.c.d.collector.CollectorTask - server1
+2021-05-04 15:43:07,158 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 15:43:07,159 [main] INFO  c.c.d.collector.SonarCollectorTask - addNewProjects projectsInSonar=0 existingProjects=0 new=0 updated=0 timeUsed=0
+2021-05-04 15:43:07,159 [main] INFO  c.c.d.collector.SonarCollectorTask - refreshData updated, total=0, updated=0, disabled=0, timeTaken=1620123187159
+2021-05-04 15:43:07,160 [main] INFO  c.c.d.collector.SonarCollectorTask - SonarCollectorTask:collect stop, totalProcessSeconds=0, totalProjectCount=0
+2021-05-04 15:43:07,162 [main] INFO  c.c.d.collector.SonarCollectorTask - SonarCollectorTask:collect stop, totalProcessSeconds=0, totalProjectCount=0
+2021-05-04 15:43:07,166 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/measures/component?component=test&metricKeys=ncloc,violations,new_vulnerabilities,critical_violations,major_violations,blocker_violations,tests,test_success_density,test_errors,test_failures,coverage,line_coverage,sqale_index,alert_status,quality_gate_details http_status=java.lang.NullPointerException http_duration=0
+2021-05-04 15:43:07,167 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/components/search?qualifiers=TRK&ps=500 http_status=java.lang.NullPointerException http_duration=0
+2021-05-04 15:43:07,170 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/web_api/qualityprofiles/changelog?qualityProfile=name&language=java http_status=java.lang.NullPointerException http_duration=0
