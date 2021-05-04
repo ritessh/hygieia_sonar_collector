@@ -28,13 +28,13 @@ import java.util.List;
 
 @Component(&quot;DefaultSonarClient&quot;)
 public class DefaultSonarClient implements SonarClient {
-<span class="fc" id="L31">    private static final Log LOG = LogFactory.getLog(DefaultSonarClient.class);</span>
+<span class="nc" id="L31">    private static final Log LOG = LogFactory.getLog(DefaultSonarClient.class);</span>
 
     protected static final String URL_RESOURCES = &quot;/web_api/resources?format=json&quot;;
     protected static final String URL_RESOURCE_DETAILS = &quot;/web_api/resources?format=json&amp;resource=%s&amp;metrics=%s&amp;includealerts=true&quot;;
-    protected static final String URL_QUALITY_PROFILES = &quot;/web_api/qualityprofiles/search&quot;;
-    protected static final String URL_QUALITY_PROFILE_PROJECT_DETAILS = &quot;/web_api/qualityprofiles/projects?key=&quot;;
-    protected static final String URL_QUALITY_PROFILE_CHANGES = &quot;/web_api/qualityprofiles/changelog?profileKey=&quot;;
+    protected static final String URL_QUALITY_PROFILES = &quot;/api/qualityprofiles/search&quot;;
+    protected static final String URL_QUALITY_PROFILE_PROJECT_DETAILS = &quot;/api/qualityprofiles/projects?key=&quot;;
+    protected static final String URL_QUALITY_PROFILE_CHANGES = &quot;/api/qualityprofiles/changelog?profileKey=&quot;;
     protected static final String DEFAULT_METRICS = &quot;ncloc,line_coverage,violations,critical_violations,major_violations,blocker_violations,violations_density,sqale_index,test_success_density,test_failures,test_errors,tests&quot;;
     protected final String metrics;
 

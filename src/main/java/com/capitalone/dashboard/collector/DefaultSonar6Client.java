@@ -34,14 +34,14 @@ import java.util.Objects;
 @Component("DefaultSonar6Client")
 public class DefaultSonar6Client implements SonarClient {
     private static final Log LOG = LogFactory.getLog(DefaultSonar6Client.class);
-    private static final String URL_RESOURCES = "/web_api/components/search?qualifiers=TRK&ps=500";
-    private static final String URL_RESOURCES_AUTHENTICATED = "/web_api/projects/search?ps=500";
-    private static final String URL_RESOURCE_DETAILS = "/web_api/measures/component?format=json&componentId=%s&metricKeys=%s&includealerts=true";
-    static final String URL_PROJECT_ANALYSES = "/web_api/project_analyses/search?project=%s";
-    private static final String URL_PROJECT_INFO = "%s/web_api/components/show?component=%s";
-    private static final String URL_QUALITY_PROFILES = "/web_api/qualityprofiles/search";
-    private static final String URL_QUALITY_PROFILE_PROJECT_DETAILS = "/web_api/qualityprofiles/projects?key=";
-    private static final String URL_QUALITY_PROFILE_CHANGES = "/web_api/qualityprofiles/changelog?profileKey=";
+    private static final String URL_RESOURCES = "/api/components/search?qualifiers=TRK&ps=500";
+    private static final String URL_RESOURCES_AUTHENTICATED = "/api/projects/search?ps=500";
+    private static final String URL_RESOURCE_DETAILS = "/api/measures/component?format=json&componentId=%s&metricKeys=%s&includealerts=true";
+    static final String URL_PROJECT_ANALYSES = "/api/project_analyses/search?project=%s";
+    private static final String URL_PROJECT_INFO = "%s/api/components/show?component=%s";
+    private static final String URL_QUALITY_PROFILES = "/api/qualityprofiles/search";
+    private static final String URL_QUALITY_PROFILE_PROJECT_DETAILS = "/api/qualityprofiles/projects?key=";
+    private static final String URL_QUALITY_PROFILE_CHANGES = "/api/qualityprofiles/changelog?profileKey=";
     private static final String DEFAULT_METRICS = "ncloc,violations,new_vulnerabilities,critical_violations,major_violations,blocker_violations,tests,test_success_density,test_errors,test_failures,coverage,line_coverage,sqale_index,alert_status,quality_gate_details";
     protected final String metrics;
 

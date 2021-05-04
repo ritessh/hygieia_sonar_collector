@@ -21,7 +21,7 @@ import org.springframework.web.client.RestOperations;
 public class SonarClientSelector {
 	private static final Log LOG = LogFactory.getLog(SonarClientSelector.class);
 
-	private static final String URL_VERSION_RESOURCE = "/web_api/server/version";
+	private static final String URL_VERSION_RESOURCE = "/api/server/version";
 
     private DefaultSonar8Client sonar8Client;
     private DefaultSonar6Client sonar6Client;
