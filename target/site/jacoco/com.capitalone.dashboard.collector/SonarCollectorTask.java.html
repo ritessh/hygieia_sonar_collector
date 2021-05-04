@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SonarCollectorTask.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">com.capitalone.dashboard:sonar-codequality-collector</a> &gt; <a href="index.source.html" class="el_package">com.capitalone.dashboard.collector</a> &gt; <span class="el_source">SonarCollectorTask.java</span></div><h1>SonarCollectorTask.java</h1><pre class="source lang-java linenums">package com.capitalone.dashboard.collector;
+import com.capitalone.dashboard.model.Configuration;
+import com.capitalone.dashboard.model.SonarCollector;
+import com.capitalone.dashboard.model.SonarProject;
+import com.capitalone.dashboard.model.CollectorItem;
+import com.capitalone.dashboard.model.CollectorType;
+import com.capitalone.dashboard.model.CodeQuality;
+import com.capitalone.dashboard.model.CollectionError;
+import com.capitalone.dashboard.model.ConfigHistOperationType;
+import com.capitalone.dashboard.model.CollectorItemConfigHistory;
+import com.capitalone.dashboard.repository.BaseCollectorRepository;
+import com.capitalone.dashboard.repository.CodeQualityRepository;
+import com.capitalone.dashboard.repository.ComponentRepository;
+import com.capitalone.dashboard.repository.ConfigurationRepository;
+import com.capitalone.dashboard.repository.SonarCollectorRepository;
+import com.capitalone.dashboard.repository.SonarProfileRepostory;
+import com.capitalone.dashboard.repository.SonarProjectRepository;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bson.types.ObjectId;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
+
+@Component
+public class SonarCollectorTask extends CollectorTask&lt;SonarCollector&gt; {
+
+<span class="fc" id="L51">    private static final Log LOG = LogFactory.getLog(SonarCollectorTask.class);</span>
+
+    private final SonarCollectorRepository sonarCollectorRepository;
+    private final SonarProjectRepository sonarProjectRepository;
+    private final CodeQualityRepository codeQualityRepository;
+    private final SonarProfileRepostory sonarProfileRepostory;
+    private final SonarClientSelector sonarClientSelector;
+    private final SonarSettings sonarSettings;
+    private final ComponentRepository dbComponentRepository;
+    private final ConfigurationRepository configurationRepository;
+<span class="fc" id="L61">    private AtomicInteger count = new AtomicInteger(0);</span>
+
+    @Autowired
+    public SonarCollectorTask(TaskScheduler taskScheduler,
+                              SonarCollectorRepository sonarCollectorRepository,
+                              SonarProjectRepository sonarProjectRepository,
+                              CodeQualityRepository codeQualityRepository,
+                              SonarProfileRepostory sonarProfileRepostory,
+                              SonarSettings sonarSettings,
+                              SonarClientSelector sonarClientSelector,
+                              ConfigurationRepository configurationRepository,
+                              ComponentRepository dbComponentRepository) {
+<span class="fc" id="L73">        super(taskScheduler, &quot;Sonar&quot;);</span>
+<span class="fc" id="L74">        this.sonarCollectorRepository = sonarCollectorRepository;</span>
+<span class="fc" id="L75">        this.sonarProjectRepository = sonarProjectRepository;</span>
+<span class="fc" id="L76">        this.codeQualityRepository = codeQualityRepository;</span>
+<span class="fc" id="L77">        this.sonarProfileRepostory = sonarProfileRepostory;</span>
+<span class="fc" id="L78">        this.sonarSettings = sonarSettings;</span>
+<span class="fc" id="L79">        this.sonarClientSelector = sonarClientSelector;</span>
+<span class="fc" id="L80">        this.dbComponentRepository = dbComponentRepository;</span>
+<span class="fc" id="L81">        this.configurationRepository = configurationRepository;</span>
+<span class="fc" id="L82">    }</span>
+
+    @Override
+    public SonarCollector getCollector() {
+
+<span class="nc" id="L87">        Configuration config = configurationRepository.findByCollectorName(&quot;Sonar&quot;);</span>
+        // Only use Admin Page server configuration when available
+        // otherwise use properties file server configuration
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if (config != null) {</span>
+<span class="nc" id="L91">            config.decryptOrEncrptInfo();</span>
+            // To clear the username and password from existing run and
+            // pick the latest
+<span class="nc" id="L94">            sonarSettings.getServers().clear();</span>
+<span class="nc" id="L95">            sonarSettings.getUsernames().clear();</span>
+<span class="nc" id="L96">            sonarSettings.getPasswords().clear();</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">            for (Map&lt;String, String&gt; sonarServer : config.getInfo()) {</span>
+<span class="nc" id="L98">                sonarSettings.getServers().add(sonarServer.get(&quot;url&quot;));</span>
+<span class="nc" id="L99">                sonarSettings.getUsernames().add(sonarServer.get(&quot;userName&quot;));</span>
+<span class="nc" id="L100">                sonarSettings.getPasswords().add(sonarServer.get(&quot;password&quot;));</span>
+<span class="nc" id="L101">            }</span>
+        }
+
+<span class="nc" id="L104">        return SonarCollector.prototype(sonarSettings.getServers(),  sonarSettings.getNiceNames());</span>
+    }
+
+    @Override
+    public BaseCollectorRepository&lt;SonarCollector&gt; getCollectorRepository() {
+<span class="nc" id="L109">        return sonarCollectorRepository;</span>
+    }
+
+    @Override
+    public String getCron() {
+<span class="nc" id="L114">        return sonarSettings.getCron();</span>
+    }
+
+    @Override
+    public void collect(SonarCollector collector) {
+<span class="fc" id="L119">        long start = System.currentTimeMillis();</span>
+<span class="fc" id="L120">        int totalProjectCount = 0;</span>
+<span class="fc" id="L121">        Set&lt;ObjectId&gt; udId = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L122">        udId.add(collector.getId());</span>
+<span class="fc" id="L123">        List&lt;SonarProject&gt; existingProjects = sonarProjectRepository.findByCollectorIdIn(udId);</span>
+<span class="fc" id="L124">        List&lt;SonarProject&gt; latestProjects = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L126" title="All 2 branches covered.">        if (!CollectionUtils.isEmpty(collector.getSonarServers())) {</span>
+
+<span class="fc bfc" id="L128" title="All 2 branches covered.">            for (int i = 0; i &lt; collector.getSonarServers().size(); i++) {</span>
+
+<span class="fc" id="L130">                String instanceUrl = collector.getSonarServers().get(i);</span>
+<span class="fc" id="L131">                logBanner(instanceUrl);</span>
+
+<span class="fc" id="L133">                Double version = sonarClientSelector.getSonarVersion(instanceUrl);</span>
+<span class="fc" id="L134">                SonarClient sonarClient = sonarClientSelector.getSonarClient(version);</span>
+
+<span class="fc" id="L136">                String username = getFromListSafely(sonarSettings.getUsernames(), i);</span>
+<span class="fc" id="L137">                String password = getFromListSafely(sonarSettings.getPasswords(), i);</span>
+<span class="fc" id="L138">                String token = getFromListSafely(sonarSettings.getTokens(), i);</span>
+<span class="fc" id="L139">                sonarClient.setServerCredentials(username, password, token);</span>
+
+<span class="fc" id="L141">                List&lt;SonarProject&gt; projects = sonarClient.getProjects(instanceUrl);</span>
+<span class="fc" id="L142">                latestProjects.addAll(projects);</span>
+
+<span class="fc" id="L144">                addNewProjects(projects, existingProjects, collector);</span>
+
+<span class="fc" id="L146">                List&lt;SonarProject&gt; enabledProjects = enabledProjects(collector, instanceUrl);</span>
+<span class="fc" id="L147">                totalProjectCount = enabledProjects.size();</span>
+<span class="fc" id="L148">                refreshData(enabledProjects, sonarClient);</span>
+
+                // Changelog apis do not exist for sonarqube versions under version 5.0
+<span class="fc bfc" id="L151" title="All 2 branches covered.">                if (version &gt;= 5.0) {</span>
+                    try {
+<span class="fc" id="L153">                        fetchQualityProfileConfigChanges(collector,instanceUrl,sonarClient);</span>
+<span class="nc" id="L154">                    } catch (Exception e) {</span>
+<span class="nc" id="L155">                        LOG.error(e);</span>
+<span class="fc" id="L156">                    }</span>
+                }
+
+            }
+        }
+<span class="fc" id="L161">        long end = System.currentTimeMillis();</span>
+<span class="fc" id="L162">        long elapsedSeconds = (end - start) / 1000;</span>
+<span class="fc" id="L163">        LOG.info(String.format(&quot;SonarCollectorTask:collect stop, totalProcessSeconds=%d, totalProjectCount=%d&quot;,</span>
+<span class="fc" id="L164">                elapsedSeconds, totalProjectCount));</span>
+
+<span class="fc" id="L166">        collector.setLastExecutionRecordCount(totalProjectCount);</span>
+<span class="fc" id="L167">        collector.setLastExecutedSeconds(elapsedSeconds);</span>
+<span class="fc" id="L168">    }</span>
+
+    private String getFromListSafely(List&lt;String&gt; ls, int index){
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        if(CollectionUtils.isEmpty(ls)) {</span>
+<span class="fc" id="L172">            return null;</span>
+<span class="pc bpc" id="L173" title="1 of 2 branches missed.">        } else if (ls.size() &gt; index){</span>
+<span class="fc" id="L174">            return ls.get(index);</span>
+        }
+<span class="nc" id="L176">        return null;</span>
+    }
+    /**
+     * Clean up unused sonar collector items
+     *
+     * @param collector
+     *            the {@link SonarCollector}
+     */
+    private void clean(SonarCollector collector, List&lt;SonarProject&gt; existingProjects) {
+        // extract unique collector item IDs from components
+        // (in this context collector_items are sonar projects)
+<span class="nc" id="L187">        Set&lt;ObjectId&gt; uniqueIDs = StreamSupport.stream(dbComponentRepository.findAll().spliterator(),false)</span>
+<span class="nc bnc" id="L188" title="All 4 branches missed.">                .filter( comp -&gt; comp.getCollectorItems() != null &amp;&amp; !comp.getCollectorItems().isEmpty())</span>
+<span class="nc" id="L189">                .map(comp -&gt; comp.getCollectorItems().get(CollectorType.CodeQuality))</span>
+                // keep nonNull List&lt;CollectorItem&gt;
+<span class="nc" id="L191">                .filter(Objects::nonNull)</span>
+                // merge all lists (flatten) into a stream
+<span class="nc" id="L193">                .flatMap(List::stream)</span>
+                // keep nonNull CollectorItems
+<span class="nc bnc" id="L195" title="All 4 branches missed.">                .filter(ci -&gt; ci != null &amp;&amp; ci.getCollectorId().equals(collector.getId()))</span>
+<span class="nc" id="L196">                .map(CollectorItem::getId)</span>
+<span class="nc" id="L197">                .collect(Collectors.toSet());</span>
+
+<span class="nc" id="L199">        List&lt;SonarProject&gt; stateChangeJobList = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        for (SonarProject job : existingProjects) {</span>
+            // collect the jobs that need to change state : enabled vs disabled.
+<span class="nc" id="L203">            boolean updated = false;</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">            if (job.isEnabled()) {</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">                if (!uniqueIDs.contains(job.getId())) {</span>
+<span class="nc" id="L206">                    job.setEnabled(false);</span>
+<span class="nc" id="L207">                    updated = true;</span>
+                }
+            } else {
+<span class="nc bnc" id="L210" title="All 4 branches missed.">                if (uniqueIDs.contains(job.getId()) &amp;&amp; job.getErrors().size() == 0) {</span>
+<span class="nc" id="L211">                    job.setEnabled(true);</span>
+<span class="nc" id="L212">                    updated = true;</span>
+                }
+            }
+<span class="nc bnc" id="L215" title="All 2 branches missed.">            if (updated) {</span>
+<span class="nc" id="L216">                stateChangeJobList.add(job);</span>
+<span class="nc" id="L217">                LOG.info(String.format(&quot;ChangeProjectStatus projectName=%s projectId=%s enabled=%s&quot;,</span>
+<span class="nc" id="L218">                        job.getProjectName(), job.getProjectId(), Boolean.toString(job.isEnabled())));</span>
+            }
+<span class="nc" id="L220">        }</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        if (!CollectionUtils.isEmpty(stateChangeJobList)) {</span>
+<span class="nc" id="L222">            sonarProjectRepository.save(stateChangeJobList);</span>
+        }
+<span class="nc" id="L224">    }</span>
+
+    private void deleteUnwantedJobs(List&lt;SonarProject&gt; latestProjects, List&lt;SonarProject&gt; existingProjects, SonarCollector collector) {
+<span class="nc" id="L227">        List&lt;SonarProject&gt; deleteJobList = new ArrayList&lt;&gt;();</span>
+
+        // First delete collector items that are not supposed to be collected anymore because the servers have moved(?)
+<span class="nc bnc" id="L230" title="All 2 branches missed.">        for (SonarProject job : existingProjects) {</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">            if (job.isPushed()) continue; // do not delete jobs that are being pushed via API</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">            if (!collector.getSonarServers().contains(job.getInstanceUrl()) ||</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">                    (!job.getCollectorId().equals(collector.getId())) ||</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">                    (!latestProjects.contains(job))) {</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">                if(!job.isEnabled()) {</span>
+<span class="nc" id="L236">                    LOG.debug(&quot;drop deleted sonar project which is disabled &quot;+job.getProjectName());</span>
+<span class="nc" id="L237">                    deleteJobList.add(job);</span>
+                } else {
+<span class="nc" id="L239">                    LOG.debug(&quot;drop deleted sonar project which is enabled &quot;+job.getProjectName());</span>
+                    // CollectorItem should be removed from components and dashboards first
+                    // then the CollectorItem (sonar proj in this case) can be deleted
+
+<span class="nc" id="L243">                    List&lt;com.capitalone.dashboard.model.Component&gt; comps = dbComponentRepository</span>
+<span class="nc" id="L244">                            .findByCollectorTypeAndItemIdIn(CollectorType.CodeQuality, Collections.singletonList(job.getId()));</span>
+
+<span class="nc bnc" id="L246" title="All 2 branches missed.">                    for (com.capitalone.dashboard.model.Component c: comps) {</span>
+<span class="nc" id="L247">                        c.getCollectorItems().get(CollectorType.CodeQuality).removeIf(collectorItem -&gt; collectorItem.getId().equals(job.getId()));</span>
+<span class="nc bnc" id="L248" title="All 2 branches missed.">                        if(CollectionUtils.isEmpty(c.getCollectorItems().get(CollectorType.CodeQuality))){</span>
+<span class="nc" id="L249">                            c.getCollectorItems().remove(CollectorType.CodeQuality);</span>
+                        }
+<span class="nc" id="L251">                    }</span>
+<span class="nc" id="L252">                    dbComponentRepository.save(comps);</span>
+
+                    // other collectors also delete the widget but not here
+                    // should not remove the code analysis widget
+                    // because it is shared by other collectors
+
+<span class="nc" id="L258">                    deleteJobList.add(job);</span>
+                }
+            }
+<span class="nc" id="L261">        }</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">        if (!CollectionUtils.isEmpty(deleteJobList)) {</span>
+<span class="nc" id="L263">            sonarProjectRepository.delete(deleteJobList);</span>
+        }
+<span class="nc" id="L265">    }</span>
+
+    private void refreshData(List&lt;SonarProject&gt; sonarProjects, SonarClient sonarClient) {
+<span class="fc" id="L268">        long start = System.currentTimeMillis();</span>
+<span class="fc" id="L269">        count.set(0);</span>
+<span class="fc" id="L270">        int updated = 0;</span>
+<span class="fc" id="L271">        int disabled = 0;</span>
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">        for (SonarProject project : sonarProjects) {</span>
+            try {
+<span class="nc" id="L274">                CodeQuality codeQuality = sonarClient.currentCodeQuality(project);</span>
+<span class="nc bnc" id="L275" title="All 4 branches missed.">                if (codeQuality != null &amp;&amp; isNewQualityData(project, codeQuality)) {</span>
+<span class="nc" id="L276">                    project.setLastUpdated(System.currentTimeMillis());</span>
+<span class="nc" id="L277">                    sonarProjectRepository.save(project);</span>
+<span class="nc" id="L278">                    codeQuality.setCollectorItemId(project.getId());</span>
+<span class="nc" id="L279">                    codeQualityRepository.save(codeQuality);</span>
+<span class="nc" id="L280">                    updated++;</span>
+                }
+<span class="nc" id="L282">            } catch (HttpClientErrorException e) {</span>
+<span class="nc bnc" id="L283" title="All 2 branches missed.">                if (e.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="nc" id="L284">                    project.setEnabled(false);</span>
+<span class="nc" id="L285">                    project.setLastUpdated(System.currentTimeMillis());</span>
+<span class="nc" id="L286">                    CollectionError error = new CollectionError(&quot;404&quot;, &quot;disabled as the project no longer exists in Sonar&quot;);</span>
+<span class="nc" id="L287">                    project.getErrors().add(error);</span>
+<span class="nc" id="L288">                    sonarProjectRepository.save(project);</span>
+<span class="nc" id="L289">                    LOG.info(&quot;Disabled as a result of HTTPStatus.NOT_FOUND, projectName=&quot; + project.getProjectName()</span>
+<span class="nc" id="L290">                            + &quot;, projectId=&quot; + project.getProjectId());</span>
+<span class="nc" id="L291">                    disabled++;</span>
+<span class="nc" id="L292">                } else {</span>
+<span class="nc" id="L293">                    LOG.error(e.getStackTrace());</span>
+                }
+<span class="nc" id="L295">            } catch (ParseException parseEx) {</span>
+<span class="nc" id="L296">                CollectionError error = new CollectionError(&quot;500&quot;, parseEx.getMessage());</span>
+<span class="nc" id="L297">                project.getErrors().add(error);</span>
+<span class="nc" id="L298">                sonarProjectRepository.save(project);</span>
+<span class="nc" id="L299">                LOG.error(parseEx);</span>
+<span class="nc" id="L300">            }</span>
+<span class="nc" id="L301">            count.getAndIncrement();</span>
+<span class="nc" id="L302">        }</span>
+<span class="fc" id="L303">        LOG.info(&quot;refreshData updated, total=&quot; + count.get() + &quot;, updated=&quot; + updated + &quot;, disabled=&quot; + disabled + &quot;, timeTaken=&quot; + start);</span>
+<span class="fc" id="L304">    }</span>
+
+    private void fetchQualityProfileConfigChanges(SonarCollector collector,String instanceUrl,SonarClient sonarClient) throws org.json.simple.parser.ParseException{
+<span class="fc" id="L307">        JSONArray qualityProfiles = sonarClient.getQualityProfiles(instanceUrl);</span>
+<span class="fc" id="L308">        JSONArray sonarProfileConfigurationChanges = new JSONArray();</span>
+
+<span class="fc bfc" id="L310" title="All 2 branches covered.">        for (Object qualityProfile : qualityProfiles ) {</span>
+<span class="fc" id="L311">            JSONObject qualityProfileJson = (JSONObject) qualityProfile;</span>
+
+<span class="fc" id="L313">            List&lt;String&gt; sonarProjects = sonarClient.retrieveProfileAndProjectAssociation(instanceUrl,qualityProfileJson);</span>
+<span class="pc bpc" id="L314" title="1 of 2 branches missed.">            if (sonarProjects != null){</span>
+<span class="fc" id="L315">                sonarProfileConfigurationChanges = sonarClient.getQualityProfileConfigurationChanges(instanceUrl,qualityProfileJson);</span>
+<span class="fc" id="L316">                addNewConfigurationChanges(collector,sonarProfileConfigurationChanges);</span>
+            }
+<span class="fc" id="L318">        }</span>
+<span class="fc" id="L319">    }</span>
+
+    private void addNewConfigurationChanges(SonarCollector collector,JSONArray sonarProfileConfigurationChanges){
+<span class="fc" id="L322">        ArrayList&lt;CollectorItemConfigHistory&gt; profileConfigChanges = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L324" title="All 2 branches covered.">        for (Object configChange : sonarProfileConfigurationChanges) {</span>
+<span class="fc" id="L325">            JSONObject configChangeJson = (JSONObject) configChange;</span>
+<span class="fc" id="L326">            CollectorItemConfigHistory profileConfigChange = new CollectorItemConfigHistory();</span>
+<span class="fc" id="L327">            Map&lt;String,Object&gt; changeMap = new HashMap&lt;&gt;();</span>
+
+<span class="fc" id="L329">            profileConfigChange.setCollectorItemId(collector.getId());</span>
+<span class="fc" id="L330">            profileConfigChange.setUserName((String) configChangeJson.get(&quot;authorName&quot;));</span>
+<span class="fc" id="L331">            profileConfigChange.setUserID((String) configChangeJson.get(&quot;authorLogin&quot;) );</span>
+<span class="fc" id="L332">            changeMap.put(&quot;event&quot;, configChangeJson);</span>
+
+<span class="fc" id="L334">            profileConfigChange.setChangeMap(changeMap);</span>
+
+<span class="fc" id="L336">            ConfigHistOperationType operation = determineConfigChangeOperationType((String)configChangeJson.get(&quot;action&quot;));</span>
+<span class="fc" id="L337">            profileConfigChange.setOperation(operation);</span>
+
+
+<span class="fc" id="L340">            long timestamp = convertToTimestamp((String) configChangeJson.get(&quot;date&quot;));</span>
+<span class="fc" id="L341">            profileConfigChange.setTimestamp(timestamp);</span>
+
+<span class="pc bpc" id="L343" title="1 of 2 branches missed.">            if (isNewConfig(collector.getId(),(String) configChangeJson.get(&quot;authorLogin&quot;),operation,timestamp)) {</span>
+<span class="fc" id="L344">                profileConfigChanges.add(profileConfigChange);</span>
+            }
+<span class="fc" id="L346">        }</span>
+<span class="fc" id="L347">        sonarProfileRepostory.save(profileConfigChanges);</span>
+<span class="fc" id="L348">    }</span>
+
+    private Boolean isNewConfig(ObjectId collectorId,String authorLogin,ConfigHistOperationType operation,long timestamp) {
+<span class="fc" id="L351">        List&lt;CollectorItemConfigHistory&gt; storedConfigs = sonarProfileRepostory.findProfileConfigChanges(collectorId, authorLogin,operation,timestamp);</span>
+<span class="fc" id="L352">        return storedConfigs.isEmpty();</span>
+    }
+
+    private List&lt;SonarProject&gt; enabledProjects(SonarCollector collector, String instanceUrl) {
+<span class="fc" id="L356">        return sonarProjectRepository.findEnabledProjects(collector.getId(), instanceUrl);</span>
+    }
+
+    private void addNewProjects(List&lt;SonarProject&gt; projects, List&lt;SonarProject&gt; existingProjects, SonarCollector collector) {
+<span class="fc" id="L360">        long start = System.currentTimeMillis();</span>
+<span class="fc" id="L361">        int newCount = 0;</span>
+<span class="fc" id="L362">        int updatedCount = 0;</span>
+<span class="fc" id="L363">        List&lt;SonarProject&gt; newProjects = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L364">        List&lt;SonarProject&gt; updateProjects = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L365" title="1 of 2 branches missed.">        for (SonarProject project : projects) {</span>
+<span class="nc" id="L366">            String niceName = getNiceName(project,collector);</span>
+            // TODO: the algorithm in this loop is of n^2, need to optimize
+<span class="nc bnc" id="L368" title="All 2 branches missed.">            if (!existingProjects.contains(project)) {</span>
+<span class="nc" id="L369">                project.setCollectorId(collector.getId());</span>
+<span class="nc" id="L370">                project.setEnabled(false);</span>
+<span class="nc" id="L371">                project.setDescription(project.getProjectName());</span>
+<span class="nc" id="L372">                project.setNiceName(niceName);</span>
+<span class="nc" id="L373">                newProjects.add(project);</span>
+<span class="nc" id="L374">                LOG.info(String.format(&quot;NewProject projectName=%s projectId=%s enabled=false&quot;,</span>
+<span class="nc" id="L375">                        project.getProjectName(), project.getProjectId()));</span>
+<span class="nc" id="L376">                newCount++;</span>
+            }else{
+<span class="nc" id="L378">                int[] indexes = IntStream.range(0,existingProjects.size()).filter(i-&gt; existingProjects.get(i).equals(project)).toArray();</span>
+<span class="nc bnc" id="L379" title="All 2 branches missed.">                for (int index :indexes) {</span>
+<span class="nc" id="L380">                    SonarProject s = existingProjects.get(index);</span>
+<span class="nc bnc" id="L381" title="All 2 branches missed.">                    if(Objects.isNull(s.getProjectId())){</span>
+<span class="nc" id="L382">                        LOG.info(&quot;ProjectId is null for sonar project=&quot;+s.getProjectName());</span>
+                    }
+<span class="nc bnc" id="L384" title="All 6 branches missed.">                    if ((Objects.nonNull(s.getProjectId()) &amp;&amp; !s.getProjectId().equals(project.getProjectId())) || !StringUtils.equals(s.getNiceName(),project.getNiceName())) {</span>
+<span class="nc" id="L385">                        LOG.info(String.format(&quot;UpdatedProject projectName=%s projectId=%s enabled=%s&quot;,</span>
+<span class="nc" id="L386">                                project.getProjectName(), s.getProjectId(), Boolean.toString(s.isEnabled())));</span>
+<span class="nc bnc" id="L387" title="All 2 branches missed.">                        if (s.getErrors().size() &gt; 0) {</span>
+<span class="nc" id="L388">                            s.getErrors().clear();</span>
+                        }
+<span class="nc" id="L390">                        s.setProjectId(project.getProjectId());</span>
+<span class="nc bnc" id="L391" title="All 2 branches missed.">                        if (StringUtils.isEmpty(s.getNiceName())) {</span>
+<span class="nc" id="L392">                            s.setNiceName(niceName);</span>
+                        }
+<span class="nc" id="L394">                        updateProjects.add(s);</span>
+<span class="nc" id="L395">                        updatedCount++;</span>
+                    }
+                }
+            }
+<span class="nc" id="L399">        }</span>
+        //save all in one shot
+<span class="pc bpc" id="L401" title="1 of 2 branches missed.">        if (!CollectionUtils.isEmpty(newProjects)) {</span>
+<span class="nc" id="L402">            sonarProjectRepository.save(newProjects);</span>
+        }
+<span class="pc bpc" id="L404" title="1 of 2 branches missed.">        if (!CollectionUtils.isEmpty(updateProjects)) {</span>
+<span class="nc" id="L405">            sonarProjectRepository.save(updateProjects);</span>
+        }
+<span class="fc" id="L407">        LOG.info(String.format(&quot;addNewProjects projectsInSonar=%d existingProjects=%d new=%d updated=%d timeUsed=%d&quot;,</span>
+<span class="fc" id="L408">                projects.size(), existingProjects.size(), newCount, updatedCount, System.currentTimeMillis()-start));</span>
+<span class="fc" id="L409">    }</span>
+
+    private String getNiceName(SonarProject project, SonarCollector sonarCollector){
+
+<span class="nc bnc" id="L413" title="All 2 branches missed.">        if (org.springframework.util.CollectionUtils.isEmpty(sonarCollector.getSonarServers())) return &quot;&quot;;</span>
+<span class="nc" id="L414">        List&lt;String&gt; servers = sonarCollector.getSonarServers();</span>
+<span class="nc" id="L415">        List&lt;String&gt; niceNames = sonarCollector.getNiceNames();</span>
+<span class="nc bnc" id="L416" title="All 2 branches missed.">        if (org.springframework.util.CollectionUtils.isEmpty(niceNames)) return &quot;&quot;;</span>
+<span class="nc bnc" id="L417" title="All 2 branches missed.">        for (int i = 0; i &lt; servers.size(); i++) {</span>
+<span class="nc bnc" id="L418" title="All 4 branches missed.">            if (servers.get(i).equalsIgnoreCase(project.getInstanceUrl()) &amp;&amp; (niceNames.size() &gt; i)) {</span>
+<span class="nc" id="L419">                return niceNames.get(i);</span>
+            }
+        }
+<span class="nc" id="L422">        return &quot;&quot;;</span>
+
+    }
+
+    @SuppressWarnings(&quot;unused&quot;)
+    private boolean isNewProject(SonarCollector collector, SonarProject application) {
+<span class="nc bnc" id="L428" title="All 2 branches missed.">        return sonarProjectRepository.findSonarProject(</span>
+<span class="nc" id="L429">                collector.getId(), application.getInstanceUrl(), application.getProjectId()) == null;</span>
+    }
+
+    private boolean isNewQualityData(SonarProject project, CodeQuality codeQuality) {
+<span class="nc bnc" id="L433" title="All 2 branches missed.">        return codeQualityRepository.findByCollectorItemIdAndTimestamp(</span>
+<span class="nc" id="L434">                project.getId(), codeQuality.getTimestamp()) == null;</span>
+    }
+
+    private long convertToTimestamp(String date) {
+
+<span class="fc" id="L439">        DateTimeFormatter formatter = DateTimeFormat.forPattern(&quot;yyyy-MM-dd'T'HH:mm:ssZ&quot;);</span>
+<span class="fc" id="L440">        DateTime dt = formatter.parseDateTime(date);</span>
+
+<span class="fc" id="L442">        return new DateTime(dt).getMillis();</span>
+    }
+
+    private ConfigHistOperationType determineConfigChangeOperationType(String changeAction){
+<span class="pc bpc" id="L446" title="2 of 3 branches missed.">        switch (changeAction) {</span>
+
+            case &quot;DEACTIVATED&quot;:
+<span class="fc" id="L449">                return ConfigHistOperationType.DELETED;</span>
+
+            case &quot;ACTIVATED&quot;:
+<span class="nc" id="L452">                return ConfigHistOperationType.CREATED;</span>
+            default:
+<span class="nc" id="L454">                return ConfigHistOperationType.CHANGED;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

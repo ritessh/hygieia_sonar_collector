@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SonarCollector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">com.capitalone.dashboard:sonar-codequality-collector</a> &gt; <a href="index.source.html" class="el_package">com.capitalone.dashboard.model</a> &gt; <span class="el_source">SonarCollector.java</span></div><h1>SonarCollector.java</h1><pre class="source lang-java linenums">package com.capitalone.dashboard.model;
+
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+<span class="fc" id="L11">public class SonarCollector extends Collector {</span>
+<span class="fc" id="L12">    private List&lt;String&gt; sonarServers = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L13">    private List&lt;String&gt; sonarMetrics = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L14">    private List&lt;String&gt; niceNames = new ArrayList&lt;&gt;();</span>
+    private static final String NICE_NAME = &quot;niceName&quot;;
+    private static final String PROJECT_NAME = &quot;options.projectName&quot;;
+
+    public List&lt;String&gt; getSonarServers() {
+<span class="fc" id="L19">        return sonarServers;</span>
+    }
+
+    public List&lt;String&gt; getSonarMetrics() {
+<span class="nc" id="L23">        return sonarMetrics;</span>
+    }
+
+    public List&lt;String&gt; getNiceNames() {
+<span class="fc" id="L27">        return niceNames;</span>
+    }
+
+    public void setNiceNames(List&lt;String&gt; niceNames) {
+<span class="nc" id="L31">        this.niceNames = niceNames;</span>
+<span class="nc" id="L32">    }</span>
+
+    public static SonarCollector prototype(List&lt;String&gt; servers, List&lt;String&gt; niceNames) {
+<span class="fc" id="L35">        SonarCollector protoType = new SonarCollector();</span>
+<span class="fc" id="L36">        protoType.setName(&quot;Sonar&quot;);</span>
+<span class="fc" id="L37">        protoType.setCollectorType(CollectorType.CodeQuality);</span>
+<span class="fc" id="L38">        protoType.setOnline(true);</span>
+<span class="fc" id="L39">        protoType.setEnabled(true);</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        if(servers!=null) {</span>
+<span class="fc" id="L41">            protoType.getSonarServers().addAll(servers);</span>
+        }
+
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">        if (!CollectionUtils.isEmpty(niceNames)) {</span>
+<span class="fc" id="L45">            protoType.getNiceNames().addAll(niceNames);</span>
+        }
+
+<span class="fc" id="L48">        Map&lt;String, Object&gt; allOptions = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L49">        allOptions.put(SonarProject.INSTANCE_URL,&quot;&quot;);</span>
+<span class="fc" id="L50">        allOptions.put(SonarProject.PROJECT_NAME,&quot;&quot;);</span>
+<span class="fc" id="L51">        allOptions.put(SonarProject.PROJECT_ID, &quot;&quot;);</span>
+<span class="fc" id="L52">        protoType.setAllFields(allOptions);</span>
+
+<span class="fc" id="L54">        Map&lt;String, Object&gt; uniqueOptions = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L55">        uniqueOptions.put(SonarProject.INSTANCE_URL,&quot;&quot;);</span>
+<span class="fc" id="L56">        uniqueOptions.put(SonarProject.PROJECT_NAME,&quot;&quot;);</span>
+<span class="fc" id="L57">        protoType.setUniqueFields(uniqueOptions);</span>
+<span class="fc" id="L58">        protoType.setSearchFields(Arrays.asList(PROJECT_NAME,NICE_NAME));</span>
+<span class="fc" id="L59">        return protoType;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

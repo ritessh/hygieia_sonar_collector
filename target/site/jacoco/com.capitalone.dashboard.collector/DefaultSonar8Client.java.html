@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DefaultSonar8Client.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">com.capitalone.dashboard:sonar-codequality-collector</a> &gt; <a href="index.source.html" class="el_package">com.capitalone.dashboard.collector</a> &gt; <span class="el_source">DefaultSonar8Client.java</span></div><h1>DefaultSonar8Client.java</h1><pre class="source lang-java linenums">package com.capitalone.dashboard.collector;
+
+import com.capitalone.dashboard.client.RestClient;
+import com.capitalone.dashboard.model.SonarProject;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
+
+@Component
+public class DefaultSonar8Client extends DefaultSonar6Client {
+<span class="fc" id="L16">    private static final Log LOG = LogFactory.getLog(DefaultSonar8Client.class);</span>
+
+    static final String URL_QUALITY_PROFILE_CHANGES = &quot;/api/qualityprofiles/changelog?qualityProfile=%s&amp;language=%s&quot;;
+    static final String URL_RESOURCE_DETAILS = &quot;/api/measures/component?component=%s&amp;metricKeys=%s&quot;;
+
+    @Autowired
+    public DefaultSonar8Client(RestClient restClient, SonarSettings settings) {
+<span class="fc" id="L23">        super(restClient, settings);</span>
+<span class="fc" id="L24">    }</span>
+
+    @Override
+    public JSONArray getQualityProfileConfigurationChanges(String instanceUrl, JSONObject qualityProfile) throws ParseException{
+<span class="fc" id="L28">        String url = String.format(instanceUrl + URL_QUALITY_PROFILE_CHANGES, qualityProfile.get(&quot;name&quot;), qualityProfile.get(&quot;language&quot;));</span>
+        try {
+<span class="fc" id="L30">            JSONArray qualityProfileConfigChanges = this.parseAsArray(url, &quot;events&quot;);</span>
+<span class="fc" id="L31">            return qualityProfileConfigChanges;</span>
+<span class="nc" id="L32">        } catch (ParseException e) {</span>
+<span class="nc" id="L33">            LOG.error(&quot;Could not parse response from: &quot; + url, e);</span>
+<span class="nc" id="L34">            throw e;</span>
+<span class="nc" id="L35">        } catch (RestClientException rce) {</span>
+<span class="nc" id="L36">            LOG.error(rce);</span>
+<span class="nc" id="L37">            throw rce;</span>
+        }
+    }
+
+    @Override
+    protected SonarProject parseSonarProject(String instanceUrl, JSONObject prjData) {
+<span class="fc" id="L43">        SonarProject project = new SonarProject();</span>
+<span class="fc" id="L44">        project.setInstanceUrl(instanceUrl);</span>
+<span class="fc" id="L45">        project.setProjectId(str(prjData, KEY));</span>
+<span class="fc" id="L46">        project.setProjectName(str(prjData, NAME));</span>
+<span class="fc" id="L47">        return project;</span>
+
+    }
+
+    protected String getResourceDetailsUrl() {
+<span class="fc" id="L52">        return URL_RESOURCE_DETAILS;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

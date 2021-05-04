@@ -1,0 +1,5 @@
+/Users/ritesh/Hygieia/hygieia-codequality-sonar-collector/src/test/java/com/capitalone/dashboard/collector/SonarClientSelectorTest.java
+/Users/ritesh/Hygieia/hygieia-codequality-sonar-collector/src/test/java/com/capitalone/dashboard/collector/DefaultSonar6ClientTest.java
+/Users/ritesh/Hygieia/hygieia-codequality-sonar-collector/src/test/java/com/capitalone/dashboard/collector/DefaultSonar8ClientTest.java
+/Users/ritesh/Hygieia/hygieia-codequality-sonar-collector/src/test/java/com/capitalone/dashboard/collector/SonarCollectorTaskTest.java
+/Users/ritesh/Hygieia/hygieia-codequality-sonar-collector/src/test/java/com/capitalone/dashboard/util/SonarDashboardUrlTest.java

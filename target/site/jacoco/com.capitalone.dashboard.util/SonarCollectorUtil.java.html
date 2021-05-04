@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SonarCollectorUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">com.capitalone.dashboard:sonar-codequality-collector</a> &gt; <a href="index.source.html" class="el_package">com.capitalone.dashboard.util</a> &gt; <span class="el_source">SonarCollectorUtil.java</span></div><h1>SonarCollectorUtil.java</h1><pre class="source lang-java linenums">package com.capitalone.dashboard.util;
+
+import com.capitalone.dashboard.collector.SonarClient;
+import com.capitalone.dashboard.model.CodeQuality;
+import com.capitalone.dashboard.model.CollectionError;
+import com.capitalone.dashboard.model.Collector;
+import com.capitalone.dashboard.model.SonarProject;
+import com.capitalone.dashboard.repository.CodeQualityRepository;
+import com.capitalone.dashboard.repository.SonarProjectRepository;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.json.simple.parser.ParseException;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+
+@Component
+public class SonarCollectorUtil {
+
+<span class="nc" id="L20">    private static final Log LOG = LogFactory.getLog(SonarCollectorUtil.class);</span>
+
+    private static SonarProjectRepository sonarProjectRepository;
+    private static CodeQualityRepository codeQualityRepository;
+
+<span class="nc" id="L25">    public SonarCollectorUtil(SonarProjectRepository sonarProjectRepository, CodeQualityRepository codeQualityRepository) {</span>
+<span class="nc" id="L26">        this.sonarProjectRepository = sonarProjectRepository;</span>
+<span class="nc" id="L27">        this.codeQualityRepository = codeQualityRepository;</span>
+<span class="nc" id="L28">    }</span>
+
+
+    public static void updateCodeQualityData(Collector sonarCollector, SonarClient sonarClient, SonarProject project) {
+        try {
+<span class="nc" id="L33">            CodeQuality codeQuality = sonarClient.currentCodeQuality(project);</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">            if (codeQuality != null) {</span>
+<span class="nc" id="L35">                project.setLastUpdated(System.currentTimeMillis());</span>
+<span class="nc" id="L36">                project.setCollectorId(sonarCollector.getId());</span>
+<span class="nc" id="L37">                sonarProjectRepository.save(project);</span>
+<span class="nc" id="L38">                codeQuality.setCollectorItemId(project.getId());</span>
+<span class="nc" id="L39">                codeQuality.setTimestamp(System.currentTimeMillis());</span>
+<span class="nc" id="L40">                codeQualityRepository.save(codeQuality);</span>
+            }
+<span class="nc" id="L42">        } catch (HttpClientErrorException e) {</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="nc" id="L44">                project.setEnabled(false);</span>
+<span class="nc" id="L45">                project.setLastUpdated(System.currentTimeMillis());</span>
+<span class="nc" id="L46">                CollectionError error = new CollectionError(&quot;404&quot;, &quot;disabled as the project no longer exists in Sonar&quot;);</span>
+<span class="nc" id="L47">                project.getErrors().add(error);</span>
+<span class="nc" id="L48">                sonarProjectRepository.save(project);</span>
+<span class="nc" id="L49">                LOG.info(String.format(&quot;Disabled as a result of HTTPStatus.NOT_FOUND, projectName=%s instanceUrl=%s&quot;,</span>
+<span class="nc" id="L50">                        project.getProjectName(), project.getInstanceUrl()));</span>
+<span class="nc" id="L51">            } else {</span>
+<span class="nc" id="L52">                LOG.error(e.getStackTrace());</span>
+            }
+<span class="nc" id="L54">        } catch (ParseException parseEx) {</span>
+<span class="nc" id="L55">            CollectionError error = new CollectionError(&quot;500&quot;, parseEx.getMessage());</span>
+<span class="nc" id="L56">            project.getErrors().add(error);</span>
+<span class="nc" id="L57">            sonarProjectRepository.save(project);</span>
+<span class="nc" id="L58">            LOG.error(parseEx);</span>
+<span class="nc" id="L59">        }</span>
+<span class="nc" id="L60">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

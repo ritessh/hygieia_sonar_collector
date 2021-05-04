@@ -1,0 +1,52 @@
+2021-05-04 13:39:06,719 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/measures/component?format=json&componentId=AVu3b-MAphY78UZXuYHp&metricKeys=ncloc,violations,new_vulnerabilities,critical_violations,major_violations,blocker_violations,tests,test_success_density,test_errors,test_failures,coverage,line_coverage,sqale_index,alert_status,quality_gate_details&includealerts=true http_status=200 http_duration=1
+2021-05-04 13:39:06,735 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/project_analyses/search?project=com.capitalone.test:TestProject http_status=200 http_duration=0
+2021-05-04 13:39:06,759 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/components/search?qualifiers=TRK&ps=500 http_status=200 http_duration=1
+2021-05-04 13:39:06,767 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/components/search?qualifiers=TRK&ps=500&p=1 http_status=200 http_duration=0
+2021-05-04 13:39:06,773 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/components/search?qualifiers=TRK&ps=500&p=2 http_status=200 http_duration=0
+2021-05-04 13:39:06,781 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/components/search?qualifiers=TRK&ps=500&p=3 http_status=200 http_duration=0
+2021-05-04 13:39:06,798 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/components/search?qualifiers=TRK&ps=500&p=4 http_status=200 http_duration=0
+2021-05-04 13:39:06,813 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/measures/component?format=json&componentId=AVu3b-MAphY78UZXuYHp&metricKeys=ncloc,violations,new_vulnerabilities,critical_violations,major_violations,blocker_violations,tests,test_success_density,test_errors,test_failures,coverage,line_coverage,sqale_index,alert_status,quality_gate_details&includealerts=true http_status=200 http_duration=0
+2021-05-04 13:39:06,814 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/project_analyses/search?project=com.capitalone.test:TestProject http_status=200 http_duration=0
+2021-05-04 13:39:06,819 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/components/search?qualifiers=TRK&ps=500 http_status=200 http_duration=0
+2021-05-04 13:39:06,820 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/components/search?qualifiers=TRK&ps=500 http_status=200 http_duration=1
+2021-05-04 13:39:11,977 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 13:39:11,978 [main] INFO  c.c.d.collector.CollectorTask - server1
+2021-05-04 13:39:11,978 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 13:39:11,979 [main] INFO  c.c.d.collector.SonarCollectorTask - addNewProjects projectsInSonar=0 existingProjects=0 new=0 updated=0 timeUsed=0
+2021-05-04 13:39:11,979 [main] INFO  c.c.d.collector.SonarCollectorTask - refreshData updated, total=0, updated=0, disabled=0, timeTaken=1620115751979
+2021-05-04 13:39:11,979 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 13:39:11,979 [main] INFO  c.c.d.collector.CollectorTask - server2
+2021-05-04 13:39:11,980 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 13:39:11,980 [main] INFO  c.c.d.collector.SonarCollectorTask - addNewProjects projectsInSonar=0 existingProjects=0 new=0 updated=0 timeUsed=0
+2021-05-04 13:39:11,980 [main] INFO  c.c.d.collector.SonarCollectorTask - refreshData updated, total=0, updated=0, disabled=0, timeTaken=1620115751980
+2021-05-04 13:39:12,070 [main] INFO  c.c.d.collector.SonarCollectorTask - SonarCollectorTask:collect stop, totalProcessSeconds=0, totalProjectCount=0
+2021-05-04 13:39:12,080 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 13:39:12,080 [main] INFO  c.c.d.collector.CollectorTask - server1
+2021-05-04 13:39:12,080 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 13:39:12,081 [main] INFO  c.c.d.collector.SonarCollectorTask - addNewProjects projectsInSonar=0 existingProjects=0 new=0 updated=0 timeUsed=0
+2021-05-04 13:39:12,081 [main] INFO  c.c.d.collector.SonarCollectorTask - refreshData updated, total=0, updated=0, disabled=0, timeTaken=1620115752081
+2021-05-04 13:39:12,081 [main] INFO  c.c.d.collector.SonarCollectorTask - SonarCollectorTask:collect stop, totalProcessSeconds=0, totalProjectCount=0
+2021-05-04 13:39:12,084 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 13:39:12,084 [main] INFO  c.c.d.collector.CollectorTask - server1
+2021-05-04 13:39:12,084 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 13:39:12,085 [main] INFO  c.c.d.collector.SonarCollectorTask - addNewProjects projectsInSonar=0 existingProjects=0 new=0 updated=0 timeUsed=0
+2021-05-04 13:39:12,085 [main] INFO  c.c.d.collector.SonarCollectorTask - refreshData updated, total=0, updated=0, disabled=0, timeTaken=1620115752085
+2021-05-04 13:39:12,086 [main] INFO  c.c.d.collector.SonarCollectorTask - SonarCollectorTask:collect stop, totalProcessSeconds=0, totalProjectCount=0
+2021-05-04 13:39:12,090 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 13:39:12,090 [main] INFO  c.c.d.collector.CollectorTask - server1
+2021-05-04 13:39:12,090 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 13:39:12,091 [main] INFO  c.c.d.collector.SonarCollectorTask - addNewProjects projectsInSonar=0 existingProjects=0 new=0 updated=0 timeUsed=0
+2021-05-04 13:39:12,091 [main] INFO  c.c.d.collector.SonarCollectorTask - refreshData updated, total=0, updated=0, disabled=0, timeTaken=1620115752091
+2021-05-04 13:39:12,092 [main] INFO  c.c.d.collector.SonarCollectorTask - SonarCollectorTask:collect stop, totalProcessSeconds=0, totalProjectCount=0
+2021-05-04 13:39:12,094 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 13:39:12,094 [main] INFO  c.c.d.collector.CollectorTask - server1
+2021-05-04 13:39:12,094 [main] INFO  c.c.d.collector.CollectorTask - -----------------------------------
+2021-05-04 13:39:12,095 [main] INFO  c.c.d.collector.SonarCollectorTask - addNewProjects projectsInSonar=0 existingProjects=0 new=0 updated=0 timeUsed=0
+2021-05-04 13:39:12,095 [main] INFO  c.c.d.collector.SonarCollectorTask - refreshData updated, total=0, updated=0, disabled=0, timeTaken=1620115752095
+2021-05-04 13:39:12,096 [main] INFO  c.c.d.collector.SonarCollectorTask - SonarCollectorTask:collect stop, totalProcessSeconds=0, totalProjectCount=0
+2021-05-04 13:39:12,098 [main] INFO  c.c.d.collector.SonarCollectorTask - SonarCollectorTask:collect stop, totalProcessSeconds=0, totalProjectCount=0
+2021-05-04 13:39:12,102 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/measures/component?component=test&metricKeys=ncloc,violations,new_vulnerabilities,critical_violations,major_violations,blocker_violations,tests,test_success_density,test_errors,test_failures,coverage,line_coverage,sqale_index,alert_status,quality_gate_details http_status=200 http_duration=0
+2021-05-04 13:39:12,103 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/project_analyses/search?project=test http_status=200 http_duration=0
+2021-05-04 13:39:12,107 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/components/search?qualifiers=TRK&ps=500 http_status=200 http_duration=0
+2021-05-04 13:39:12,108 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/components/search?qualifiers=TRK&ps=500 http_status=200 http_duration=0
+2021-05-04 13:39:12,110 [main] INFO  c.c.dashboard.client.RestClient - makeRestCall http_method=GET http_url=http://sonar.com/api/qualityprofiles/changelog?qualityProfile=name&language=java http_status=200 http_duration=0

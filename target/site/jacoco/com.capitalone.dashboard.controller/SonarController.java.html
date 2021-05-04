@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SonarController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">com.capitalone.dashboard:sonar-codequality-collector</a> &gt; <a href="index.source.html" class="el_package">com.capitalone.dashboard.controller</a> &gt; <span class="el_source">SonarController.java</span></div><h1>SonarController.java</h1><pre class="source lang-java linenums">package com.capitalone.dashboard.controller;
+
+import com.capitalone.dashboard.collector.SonarClient;
+import com.capitalone.dashboard.collector.SonarClientSelector;
+import com.capitalone.dashboard.model.Collector;
+import com.capitalone.dashboard.model.SonarProject;
+import com.capitalone.dashboard.repository.CodeQualityRepository;
+import com.capitalone.dashboard.repository.CollectorRepository;
+import com.capitalone.dashboard.repository.SonarProjectRepository;
+import com.capitalone.dashboard.util.SonarCollectorUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
+@RestController
+@Validated
+public class SonarController {
+
+    private final SonarProjectRepository sonarProjectRepository;
+    private final CodeQualityRepository codeQualityRepository;
+    private final CollectorRepository collectorRepository;
+    private SonarClientSelector sonarClientSelector;
+
+    @Autowired
+    public SonarController(SonarProjectRepository sonarProjectRepository,
+                           CodeQualityRepository codeQualityRepository,
+                           CollectorRepository collectorRepository,
+<span class="nc" id="L45">                           SonarClientSelector sonarClientSelector) {</span>
+<span class="nc" id="L46">        this.sonarProjectRepository = sonarProjectRepository;</span>
+<span class="nc" id="L47">        this.codeQualityRepository = codeQualityRepository;</span>
+<span class="nc" id="L48">        this.collectorRepository = collectorRepository;</span>
+<span class="nc" id="L49">        this.sonarClientSelector = sonarClientSelector;</span>
+<span class="nc" id="L50">    }</span>
+
+    @RequestMapping(value = &quot;/refresh&quot;, method = GET, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity&lt;String&gt; refresh(@Valid String projectName, @Valid String projectKey, @Valid String instanceUrl) {
+
+<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (Objects.nonNull(instanceUrl)) {</span>
+<span class="nc" id="L56">            SonarClient sonarClient = this.sonarClientSelector.getSonarClient(this.sonarClientSelector.getSonarVersion(instanceUrl));</span>
+<span class="nc" id="L57">            Collector collector = collectorRepository.findByName(&quot;Sonar&quot;);</span>
+
+            SonarProject projectToRefresh;
+<span class="nc bnc" id="L60" title="All 2 branches missed.">            if (Objects.nonNull(collector)) {</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">                if ((Objects.nonNull(projectName) &amp;&amp;</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">                        Objects.nonNull(projectToRefresh = getExistingProject(collector.getId(),</span>
+                                instanceUrl, projectName, projectKey, sonarClient)))) {
+<span class="nc" id="L64">                    SonarCollectorUtil.updateCodeQualityData(collector, sonarClient, projectToRefresh);</span>
+<span class="nc" id="L65">                    return sendResponse(&quot;successfully refreshed sonar project&quot;);</span>
+                }
+<span class="nc" id="L67">                return sendResponse(&quot;unable to refresh sonar project&quot;);</span>
+            }
+<span class="nc" id="L69">            return sendResponse(&quot;sonar collector not found&quot;);</span>
+        }
+<span class="nc" id="L71">        return sendResponse(&quot;sonar instance url is invalid&quot;);</span>
+    }
+
+    private ResponseEntity&lt;String&gt; sendResponse(String message) {
+<span class="nc" id="L75">        HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="nc" id="L76">        httpHeaders.setContentType(MediaType.APPLICATION_JSON);</span>
+<span class="nc" id="L77">        return new ResponseEntity&lt;&gt;(message, httpHeaders, HttpStatus.OK);</span>
+    }
+
+    private SonarProject getExistingProject(ObjectId collectorId, String instanceUrl, String projectName,
+                                            String projectKey, SonarClient sonarClient) {
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (Objects.nonNull(projectKey)) {</span>
+<span class="nc" id="L83">            SonarProject project = sonarClient.getProject(projectKey, instanceUrl);</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">            if (Objects.nonNull(project)) {</span>
+<span class="nc" id="L85">                List&lt;SonarProject&gt; sonarProjects = sonarProjectRepository.</span>
+<span class="nc" id="L86">                        findSonarProjectsByProjectName(collectorId, instanceUrl, projectName);</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">                if (CollectionUtils.isNotEmpty(sonarProjects)) {</span>
+<span class="nc bnc" id="L88" title="All 4 branches missed.">                    sonarProjects = sonarProjects.stream().filter(p -&gt; p.getProjectId()==null || project.getProjectId().equals(p.getProjectId())).collect(Collectors.toList());</span>
+                }
+<span class="nc bnc" id="L90" title="All 2 branches missed.">                if (CollectionUtils.isNotEmpty(sonarProjects)) {</span>
+<span class="nc" id="L91">                    Collections.sort(sonarProjects, Comparator.comparing(SonarProject::getLastUpdated).reversed());</span>
+<span class="nc" id="L92">                    SonarProject existingProject = sonarProjects.get(0);</span>
+<span class="nc" id="L93">                    existingProject.setProjectId(project.getProjectId());</span>
+<span class="nc" id="L94">                    return existingProject;</span>
+                }
+            }
+        }
+<span class="nc" id="L98">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DefaultSonarClient.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">com.capitalone.dashboard:sonar-codequality-collector</a> &gt; <a href="index.source.html" class="el_package">com.capitalone.dashboard.collector</a> &gt; <span class="el_source">DefaultSonarClient.java</span></div><h1>DefaultSonarClient.java</h1><pre class="source lang-java linenums">package com.capitalone.dashboard.collector;
+
+import com.capitalone.dashboard.client.RestClient;
+import com.capitalone.dashboard.client.RestUserInfo;
+import com.capitalone.dashboard.model.CodeQuality;
+import com.capitalone.dashboard.model.CodeQualityMetric;
+import com.capitalone.dashboard.model.CodeQualityMetricStatus;
+import com.capitalone.dashboard.model.CodeQualityType;
+import com.capitalone.dashboard.model.SonarProject;
+import com.capitalone.dashboard.util.SonarDashboardUrl;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
+
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+@Component(&quot;DefaultSonarClient&quot;)
+public class DefaultSonarClient implements SonarClient {
+<span class="fc" id="L31">    private static final Log LOG = LogFactory.getLog(DefaultSonarClient.class);</span>
+
+    protected static final String URL_RESOURCES = &quot;/api/resources?format=json&quot;;
+    protected static final String URL_RESOURCE_DETAILS = &quot;/api/resources?format=json&amp;resource=%s&amp;metrics=%s&amp;includealerts=true&quot;;
+    protected static final String URL_QUALITY_PROFILES = &quot;/api/qualityprofiles/search&quot;;
+    protected static final String URL_QUALITY_PROFILE_PROJECT_DETAILS = &quot;/api/qualityprofiles/projects?key=&quot;;
+    protected static final String URL_QUALITY_PROFILE_CHANGES = &quot;/api/qualityprofiles/changelog?profileKey=&quot;;
+    protected static final String DEFAULT_METRICS = &quot;ncloc,line_coverage,violations,critical_violations,major_violations,blocker_violations,violations_density,sqale_index,test_success_density,test_failures,test_errors,tests&quot;;
+    protected final String metrics;
+
+    protected static final String DATE_FORMAT = &quot;yyyy-MM-dd'T'HH:mm:ssZ&quot;;
+    protected static final String ID = &quot;id&quot;;
+    protected static final String NAME = &quot;name&quot;;
+    protected static final String KEY = &quot;key&quot;;
+    protected static final String VERSION = &quot;version&quot;;
+    protected static final String MSR = &quot;msr&quot;;
+    protected static final String ALERT = &quot;alert&quot;;
+    protected static final String ALERT_TEXT = &quot;alert_text&quot;;
+    protected static final String VALUE = &quot;val&quot;;
+    protected static final String FORMATTED_VALUE = &quot;frmt_val&quot;;
+    protected static final String STATUS_WARN = &quot;WARN&quot;;
+    protected static final String STATUS_ALERT = &quot;ALERT&quot;;
+    protected static final String DATE = &quot;date&quot;;
+
+    protected final RestClient restClient;
+    protected RestUserInfo userInfo;
+
+    @Autowired
+<span class="nc" id="L59">    public DefaultSonarClient(RestClient restClient, SonarSettings settings) {</span>
+<span class="nc" id="L60">        this.restClient = restClient;</span>
+
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (!StringUtils.isEmpty(settings.getMetricsBefore63())) {</span>
+<span class="nc" id="L63">            metrics = settings.getMetricsBefore63();</span>
+        } else {
+<span class="nc" id="L65">            metrics = DEFAULT_METRICS;</span>
+        }
+<span class="nc" id="L67">    }</span>
+
+    @Override
+    public void setServerCredentials(String username, String password, String token) {
+        // use token when given
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (StringUtils.isNotBlank(token)) {</span>
+<span class="nc" id="L73">            this.userInfo.setToken(token);</span>
+<span class="nc" id="L74">            this.userInfo.setUserId(null);</span>
+<span class="nc" id="L75">            this.userInfo.setPassCode(null);</span>
+        }
+
+        // but username and password override token
+<span class="nc bnc" id="L79" title="All 4 branches missed.">        if(StringUtils.isNotBlank(username) &amp;&amp; StringUtils.isNotBlank(password)){</span>
+<span class="nc" id="L80">            this.userInfo = new RestUserInfo(username, password);</span>
+        }
+
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        if (StringUtils.isNotBlank(token)</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">                &amp;&amp; StringUtils.isNotBlank(username)</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">                &amp;&amp; StringUtils.isNotBlank(password)) {</span>
+<span class="nc" id="L86">            LOG.error(&quot;Only one mode of authentication is needed. Either token or username/password. &quot; +</span>
+                    &quot;Both modes were detected. Using username/password&quot;);
+        }
+<span class="nc" id="L89">    }</span>
+
+    @Override
+    public List&lt;SonarProject&gt; getProjects(String instanceUrl) {
+<span class="nc" id="L93">        List&lt;SonarProject&gt; projects = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L94">        String url = instanceUrl + URL_RESOURCES;</span>
+
+        try {
+
+<span class="nc bnc" id="L98" title="All 2 branches missed.">            for (Object obj : parseAsArray(url)) {</span>
+<span class="nc" id="L99">                JSONObject prjData = (JSONObject) obj;</span>
+
+<span class="nc" id="L101">                SonarProject project = new SonarProject();</span>
+<span class="nc" id="L102">                project.setInstanceUrl(instanceUrl);</span>
+<span class="nc" id="L103">                project.setProjectId(str(prjData, ID));</span>
+<span class="nc" id="L104">                project.setProjectName(str(prjData, NAME));</span>
+<span class="nc" id="L105">                projects.add(project);</span>
+<span class="nc" id="L106">            }</span>
+
+<span class="nc" id="L108">        } catch (ParseException e) {</span>
+<span class="nc" id="L109">            LOG.error(&quot;Could not parse response from: &quot; + url, e);</span>
+<span class="nc" id="L110">        } catch (RestClientException rce) {</span>
+<span class="nc" id="L111">            LOG.error(rce);</span>
+<span class="nc" id="L112">        }</span>
+
+<span class="nc" id="L114">        return projects;</span>
+    }
+
+
+    @Override
+    public CodeQuality currentCodeQuality(SonarProject project) {
+<span class="nc" id="L120">        String url = String.format(</span>
+<span class="nc" id="L121">                project.getInstanceUrl() + URL_RESOURCE_DETAILS, project.getProjectId(), metrics);</span>
+
+        try {
+<span class="nc" id="L124">            JSONArray jsonArray = parseAsArray(url);</span>
+
+<span class="nc bnc" id="L126" title="All 2 branches missed.">            if (!jsonArray.isEmpty()) {</span>
+<span class="nc" id="L127">                JSONObject prjData = (JSONObject) jsonArray.get(0);</span>
+
+<span class="nc" id="L129">                CodeQuality codeQuality = new CodeQuality();</span>
+<span class="nc" id="L130">                codeQuality.setName(str(prjData, NAME));</span>
+<span class="nc" id="L131">                codeQuality.setUrl(new SonarDashboardUrl(project.getInstanceUrl(), project.getProjectId()).toString());</span>
+<span class="nc" id="L132">                codeQuality.setType(CodeQualityType.StaticAnalysis);</span>
+<span class="nc" id="L133">                codeQuality.setTimestamp(timestamp(prjData, DATE));</span>
+<span class="nc" id="L134">                codeQuality.setVersion(str(prjData, VERSION));</span>
+
+<span class="nc bnc" id="L136" title="All 2 branches missed.">                for (Object metricObj : (JSONArray) prjData.get(MSR)) {</span>
+<span class="nc" id="L137">                    JSONObject metricJson = (JSONObject) metricObj;</span>
+
+<span class="nc" id="L139">                    CodeQualityMetric metric = new CodeQualityMetric(str(metricJson, KEY));</span>
+<span class="nc" id="L140">                    metric.setValue(str(metricJson, VALUE));</span>
+<span class="nc" id="L141">                    metric.setFormattedValue(str(metricJson, FORMATTED_VALUE));</span>
+<span class="nc" id="L142">                    metric.setStatus(metricStatus(str(metricJson, ALERT)));</span>
+<span class="nc" id="L143">                    metric.setStatusMessage(str(metricJson, ALERT_TEXT));</span>
+<span class="nc" id="L144">                    codeQuality.getMetrics().add(metric);</span>
+<span class="nc" id="L145">                }</span>
+
+<span class="nc" id="L147">                return codeQuality;</span>
+            }
+
+<span class="nc" id="L150">        } catch (ParseException e) {</span>
+<span class="nc" id="L151">            LOG.error(&quot;Could not parse response from: &quot; + url, e);</span>
+<span class="nc" id="L152">        } catch (RestClientException rce) {</span>
+<span class="nc" id="L153">            LOG.error(rce);</span>
+<span class="nc" id="L154">        }</span>
+
+<span class="nc" id="L156">        return null;</span>
+    }
+
+    public JSONArray getQualityProfiles(String instanceUrl) throws ParseException {
+<span class="nc" id="L160">    	String url = instanceUrl + URL_QUALITY_PROFILES;</span>
+    	try {
+<span class="nc" id="L162">    		JSONArray qualityProfileData = parseAsArray(url,&quot;profiles&quot;);</span>
+<span class="nc" id="L163">    		return qualityProfileData;</span>
+<span class="nc" id="L164">    	} catch (ParseException e) {</span>
+<span class="nc" id="L165">    		LOG.error(&quot;Could not parse response from: &quot; + url, e);</span>
+<span class="nc" id="L166">    		throw e;</span>
+<span class="nc" id="L167">    	} catch (RestClientException rce) {</span>
+<span class="nc" id="L168">    		LOG.error(rce);</span>
+<span class="nc" id="L169">    		throw rce;</span>
+    	}
+    }
+
+    public List&lt;String&gt; retrieveProfileAndProjectAssociation(String instanceUrl,JSONObject qualityProfile) throws ParseException{
+<span class="nc" id="L174">    	List&lt;String&gt; projects = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L175">    	String url = instanceUrl + URL_QUALITY_PROFILE_PROJECT_DETAILS + qualityProfile.get(&quot;key&quot;);</span>
+    	try {
+<span class="nc" id="L177">    		JSONArray associatedProjects = this.parseAsArray(url, &quot;results&quot;);</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">    		if (!CollectionUtils.isEmpty(associatedProjects)) {</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">    			for (Object project : associatedProjects) {</span>
+<span class="nc" id="L180">    				JSONObject projectJson = (JSONObject) project;</span>
+<span class="nc" id="L181">    				String projectName = (String) projectJson.get(&quot;name&quot;);</span>
+<span class="nc" id="L182">    				projects.add(projectName);</span>
+<span class="nc" id="L183">    			}</span>
+<span class="nc" id="L184">    			return projects;</span>
+    		}
+<span class="nc" id="L186">    		return null;</span>
+<span class="nc" id="L187">    	} catch (ParseException e) {</span>
+<span class="nc" id="L188">    		LOG.error(&quot;Could not parse response from: &quot; + url, e);</span>
+<span class="nc" id="L189">    		throw e;</span>
+<span class="nc" id="L190">    	} catch (RestClientException rce) {</span>
+<span class="nc" id="L191">    		LOG.error(rce);</span>
+<span class="nc" id="L192">    		throw rce;</span>
+    	}
+    }
+    
+   public JSONArray getQualityProfileConfigurationChanges(String instanceUrl,JSONObject qualityProfile) throws ParseException{
+<span class="nc" id="L197">	   String url = instanceUrl + URL_QUALITY_PROFILE_CHANGES + qualityProfile.get(&quot;key&quot;);</span>
+	   try {
+<span class="nc" id="L199">		   JSONArray qualityProfileConfigChanges = this.parseAsArray(url, &quot;events&quot;);</span>
+<span class="nc" id="L200">		   return qualityProfileConfigChanges;</span>
+<span class="nc" id="L201">	   } catch (ParseException e) {</span>
+<span class="nc" id="L202">		   LOG.error(&quot;Could not parse response from: &quot; + url, e);</span>
+<span class="nc" id="L203">		   throw e;</span>
+<span class="nc" id="L204">	   } catch (RestClientException rce) {</span>
+<span class="nc" id="L205">		   LOG.error(rce);</span>
+<span class="nc" id="L206">		   throw rce;</span>
+	   }
+   }
+
+    @Override
+    public SonarProject getProject(String projectKey, String instanceUrl) {
+<span class="nc" id="L212">        return null;</span>
+    }
+
+    protected JSONArray parseAsArray(String url) throws ParseException {
+<span class="nc" id="L216">        ResponseEntity&lt;String&gt; response = restClient.makeRestCallGet(url, this.userInfo);</span>
+<span class="nc" id="L217">        return (JSONArray) new JSONParser().parse(response.getBody());</span>
+    }
+
+    protected JSONArray parseAsArray(String url, String key) throws ParseException {
+<span class="nc" id="L221">        ResponseEntity&lt;String&gt; response = restClient.makeRestCallGet(url, this.userInfo);</span>
+<span class="nc" id="L222">        JSONParser jsonParser = new JSONParser();</span>
+<span class="nc" id="L223">        JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody());</span>
+<span class="nc" id="L224">        LOG.debug(url);</span>
+<span class="nc" id="L225">        return (JSONArray) jsonObject.get(key);</span>
+    }
+
+    protected long timestamp(JSONObject json, String key) {
+<span class="nc" id="L229">        Object obj = json.get(key);</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">        if (obj != null) {</span>
+            try {
+<span class="nc" id="L232">                return new SimpleDateFormat(DATE_FORMAT).parse(obj.toString()).getTime();</span>
+<span class="nc" id="L233">            } catch (java.text.ParseException e) {</span>
+<span class="nc" id="L234">                LOG.error(obj + &quot; is not in expected format &quot; + DATE_FORMAT, e);</span>
+            }
+        }
+<span class="nc" id="L237">        return 0;</span>
+    }
+
+    protected String str(JSONObject json, String key) {
+<span class="nc" id="L241">        Object obj = json.get(key);</span>
+<span class="nc bnc" id="L242" title="All 2 branches missed.">        return obj == null ? null : obj.toString();</span>
+    }
+    @SuppressWarnings(&quot;unused&quot;)
+    protected Integer integer(JSONObject json, String key) {
+<span class="nc" id="L246">        Object obj = json.get(key);</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">        return obj == null ? null : (Integer) obj;</span>
+    }
+
+    @SuppressWarnings(&quot;unused&quot;)
+    protected BigDecimal decimal(JSONObject json, String key) {
+<span class="nc" id="L252">        Object obj = json.get(key);</span>
+<span class="nc bnc" id="L253" title="All 2 branches missed.">        return obj == null ? null : new BigDecimal(obj.toString());</span>
+    }
+
+    @SuppressWarnings(&quot;unused&quot;)
+    protected Boolean bool(JSONObject json, String key) {
+<span class="nc" id="L258">        Object obj = json.get(key);</span>
+<span class="nc bnc" id="L259" title="All 2 branches missed.">        return obj == null ? null : Boolean.valueOf(obj.toString());</span>
+    }
+
+    protected CodeQualityMetricStatus metricStatus(String status) {
+<span class="nc bnc" id="L263" title="All 2 branches missed.">        if (StringUtils.isBlank(status)) {</span>
+<span class="nc" id="L264">            return CodeQualityMetricStatus.Ok;</span>
+        }
+
+<span class="nc bnc" id="L267" title="All 3 branches missed.">        switch(status) {</span>
+<span class="nc" id="L268">            case STATUS_WARN:  return CodeQualityMetricStatus.Warning;</span>
+<span class="nc" id="L269">            case STATUS_ALERT: return CodeQualityMetricStatus.Alert;</span>
+<span class="nc" id="L270">            default:           return CodeQualityMetricStatus.Ok;</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

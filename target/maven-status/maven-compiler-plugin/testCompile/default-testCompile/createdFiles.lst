@@ -1,0 +1,5 @@
+com/capitalone/dashboard/collector/DefaultSonar6ClientTest.class
+com/capitalone/dashboard/collector/SonarClientSelectorTest.class
+com/capitalone/dashboard/util/SonarDashboardUrlTest.class
+com/capitalone/dashboard/collector/DefaultSonar8ClientTest.class
+com/capitalone/dashboard/collector/SonarCollectorTaskTest.class
